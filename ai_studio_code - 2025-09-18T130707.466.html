@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spencer-Brown Models of Jurgenson & Flusser</title>
+    <style>
+        /*
+         * GLOBAL STYLES & VARIABLES
+         * Define root variables for consistent theming and basic element styles.
+         */
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #00bcd4; /* Cyan - for emphasis and highlights */
+            --code-bg-color: #333;
+            --code-text-color: #e0e0e0;
+            --main-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --mono-font: 'Fira Code', 'Roboto Mono', 'Courier New', monospace;
+        }
+
+        /*
+         * BODY & PRESENTATION CONTAINER
+         * Full viewport coverage, center content, hide overflow.
+         */
+        body {
+            margin: 0;
+            font-family: var(--main-font);
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            overflow: hidden; /* Hide scrollbars for presentation mode */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            user-select: none; /* Prevent accidental text selection during navigation */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE/Edge */
+        }
+
+        .presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*
+         * SLIDE STYLING
+         * Each slide takes full viewport, hidden by default, with transitions.
+         */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: scale(0.95); /* Slightly scale down when inactive */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1); /* Full scale when active */
+            pointer-events: auto; /* Allow interaction when active */
+        }
+
+        /*
+         * TYPOGRAPHY
+         * Headings, lists, strong text.
+         */
+        h1, h2, h3 {
+            color: var(--accent-color);
+            margin-bottom: 0.5em;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-top: 1em;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            margin-top: 1em;
+            color: var(--text-color); /* Subheadings can be less prominent */
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin: 1em auto;
+            max-width: 80%;
+            font-size: 1.15em;
+        }
+
+        li {
+            margin-bottom: 0.8em;
+            line-height: 1.5;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            max-width: 85%;
+            margin: 1em auto;
+        }
+
+        strong {
+            color: var(--accent-color);
+        }
+
+        /*
+         * CODE & FORMAL NOTATION STYLING
+         * Distinctive styling for code blocks and Spencer-Brown elements.
+         */
+        .code, pre {
+            font-family: var(--mono-font);
+            background-color: var(--code-bg-color);
+            color: var(--code-text-color);
+            padding: 0.8em 1.2em;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 0.5em 0;
+            text-align: left;
+            white-space: pre-wrap; /* Allow long lines to wrap */
+            word-break: break-word;
+            font-size: 0.95em;
+            max-width: 90%;
+        }
+
+        pre {
+            display: block; /* For multi-line code blocks */
+        }
+
+        /* Spencer-Brown specific elements */
+        .sb-box, .sb-operator {
+            font-family: var(--mono-font);
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .sb-box {
+            border: 1px solid var(--accent-color);
+            padding: 2px 4px;
+            margin: 0 2px;
+            display: inline-block;
+        }
+
+        .sb-notation {
+            font-family: var(--mono-font);
+            font-size: 1.1em;
+            background-color: #2b2b2b;
+            padding: 0.5em 0.8em;
+            border-left: 3px solid var(--accent-color);
+            margin: 0.8em auto;
+            max-width: 90%;
+            text-align: left;
+            color: var(--code-text-color);
+            display: block; /* Ensures it takes its own line within an li */
+        }
+        .sb-notation span {
+            color: var(--text-color); /* Default text color for the description part */
+        }
+
+        /*
+         * RESPONSIVE ADJUSTMENTS
+         * Media queries for various screen sizes (mobile-first approach).
+         */
+        @media (max-width: 1024px) {
+            h1 { font-size: 2.4em; }
+            h2 { font-size: 1.8em; }
+            h3 { font-size: 1.4em; }
+            ul { font-size: 1.05em; max-width: 85%; }
+            p { font-size: 1em; }
+            .code, pre, .sb-notation { font-size: 0.9em; max-width: 90%; }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+            h3 { font-size: 1.2em; }
+            ul { font-size: 1em; max-width: 90%; }
+            p { font-size: 0.95em; max-width: 90%; }
+            .code, pre, .sb-notation { font-size: 0.85em; max-width: 95%; }
+            .sb-notation { padding: 0.4em 0.6em; }
+            .slide { padding: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.7em; }
+            h2 { font-size: 1.3em; }
+            h3 { font-size: 1.1em; }
+            ul { font-size: 0.95em; max-width: 95%; }
+            p { font-size: 0.9em; max-width: 95%; }
+            .code, pre, .sb-notation { font-size: 0.8em; }
+            .slide { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container" id="presentationContainer">
+
+        <!-- Slide 1: Title Slide -->
+        <div class="slide active">
+            <h1>Spencer-Brown Inspired Formal Models</h1>
+            <h2>Jurgenson and Flusser's Arguments</h2>
+            <h3>Structured Index of Theoretical Components</h3>
+        </div>
+
+        <!-- Slide 2: Jurgenson's Primary Distinctions -->
+        <div class="slide">
+            <h2>Jurgenson's Anti-Dualist Framework</h2>
+            <h3>Primary Distinction Structure:</h3>
+            <ul>
+                <li><span class="sb-notation"><span class="sb-box">◻₁</span> Digital Dualism</span> → The false belief that online and offline experiences constitute separate, hierarchically ordered realms</li>
+                <li><span class="sb-notation"><span class="sb-box">◻₂</span> Augmented Reality</span> → The unmarked/integrated state representing lived reality at the intersection of digital and physical</li>
+                <li><span class="sb-notation"><span class="sb-box">◻₃</span> Online/Offline Binary</span> → Sub-distinction creating false separation between connected and disconnected states</li>
+                <li><span class="sb-notation"><span class="sb-box">◻₄</span> IRL Fetish</span> → Pathological fixation valorizing disconnected "real life" experience</li>
+                <li><span class="sb-notation"><span class="sb-box">◻₅</span> Social Photo</span> → Transformed photographic practice as communication rather than documentation</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Jurgenson's Morphological Operations -->
+        <div class="slide">
+            <h2>Jurgenson's Anti-Dualist Framework</h2>
+            <h3>Morphological Operations:</h3>
+            <ul>
+                <li><span class="sb-notation"><span class="sb-operator">→₁</span> Dualistic Critique</span>: <span class="code">◻₁ ⊢ ¬◻₁ → ◻₂</span> (Critical dissolution of false binary revealing integrated reality)</li>
+                <li><span class="sb-notation"><span class="sb-operator">→₂</span> Logical Transformation</span>: <span class="code">(A ∨ ¬A) → (A ∧ ¬A)</span> (Movement from exclusive to inclusive logic)</li>
+                <li><span class="sb-notation"><span class="sb-operator">→₃</span> Therapeutic Dissolution</span>: <span class="code">◻₄ → ¬◻₄ → ◻₂</span> (Resolution of disconnection anxiety)</li>
+                <li><span class="sb-notation"><span class="sb-operator">→₄</span> Media Transformation</span>: Documentary photo → Social communication medium</li>
+            </ul>
+        </div>
+
+        <!-- Slide 4: Flusser's Primary Distinctions -->
+        <div class="slide">
+            <h2>Flusser's Apparatus Theory</h2>
+            <h3>Primary Distinction Structure:</h3>
+            <ul>
+                <li><span class="sb-notation"><span class="sb-box">■₁</span> Apparatus</span> → Technological system containing embedded programs that constrain possible outputs</li>
+                <li><span class="sb-notation"><span class="sb-box">■₂</span> Human Gesture</span> → Creative intervention attempting to insert unprogrammed information</li>
+                <li><span class="sb-notation"><span class="sb-box">■₃</span> Program</span> → Pre-inscribed possibilities that appear as freedom while constraining choice</li>
+                <li><span class="sb-notation"><span class="sb-box">■₄</span> Freedom</span> → Capacity to "outwit" programmed constraints through skilled manipulation</li>
+                <li><span class="sb-notation"><span class="sb-box">■₅</span> Technical Image</span> → Third-order abstraction: image of concepts rather than world</li>
+                <li><span class="sb-notation"><span class="sb-box">■₆</span> Post-History</span> → Cybernetic condition where feedback loops replace linear causality</li>
+            </ul>
+        </div>
+
+        <!-- Slide 5: Flusser's Morphological Operations -->
+        <div class="slide">
+            <h2>Flusser's Apparatus Theory</h2>
+            <h3>Morphological Operations:</h3>
+            <ul>
+                <li><span class="sb-notation"><span class="sb-operator">⟶₁</span> Gestural Intervention</span>: <span class="code">■₁ ⊢ ■₂ → (■₁ ∧ ■₂)</span> (Apparatus operation becomes creative through human skill)</li>
+                <li><span class="sb-notation"><span class="sb-operator">⟶₂</span> Program Resistance</span>: <span class="code">■₃ → ¬■₃ → ■₄</span> (Photographer moves from following to outwitting program)</li>
+                <li><span class="sb-notation"><span class="sb-operator">⟶₃</span> Historical Progression</span>: <span class="code">Magic → History → PostHistory</span> (Evolutionary media epochs)</li>
+                <li><span class="sb-notation"><span class="sb-operator">⟶₄</span> Feedback Loop</span>: <span class="code">■₁ ⟷ ■₂ → ■₁∪■₂</span> (Dialectical apparatus-operator relationship)</li>
+            </ul>
+        </div>
+
+        <!-- Slide 6: Categorical Structure (OLOG Framework) -->
+        <div class="slide">
+            <h2>Categorical Structure (OLOG Framework)</h2>
+            <h3>Objects:</h3>
+            <ul>
+                <li><strong>E</strong> (Experience) - Lived reality as hybrid formation</li>
+                <li><strong>T</strong> (Technology) - Technical systems and apparatus</li>
+                <li><strong>H</strong> (Human Agency) - Creative intervention and resistance</li>
+                <li><strong>S</strong> (Social Practice) - Meaningful cultural activities</li>
+            </ul>
+            <h3>Morphisms:</h3>
+            <ul>
+                <li><span class="code">mediated_by: E → T</span> (Experience is technologically mediated)</li>
+                <li><span class="code">enables: T → H</span> (Technology enables/constrains agency)</li>
+                <li><span class="code">creates: H → S</span> (Agency produces meaningful practices)</li>
+                <li><span class="code">shapes: S → E</span> (Practices recursively constitute experience)</li>
+            </ul>
+            <h3>Commutative Diagram:</h3>
+            <pre class="code">E → T → H → S → E</pre>
+            <p>(Circular co-determination)</p>
+        </div>
+
+        <!-- Slide 7: Convergent Logical Structures - Anti-Binary Critiques -->
+        <div class="slide">
+            <h2>Convergent Logical Structures</h2>
+            <h3>Both theorists develop anti-binary critiques:</h3>
+            <ul>
+                <li><strong>Jurgenson</strong>: <span class="code">¬(Online ∨ Offline) → AugmentedReality</span></li>
+                <li><strong>Flusser</strong>: <span class="code">¬(Human ∨ Machine) → ApparatusComplex</span></li>
+            </ul>
+        </div>
+
+        <!-- Slide 8: Convergent Logical Structures - Dialectical Resolutions & Constrained Agency -->
+        <div class="slide">
+            <h2>Convergent Logical Structures (cont.)</h2>
+            <h3>Both propose dialectical resolutions:</h3>
+            <ul>
+                <li><strong>Jurgenson</strong>: <span class="code">Digital ∧ Physical = IntegratedExperience</span></li>
+                <li><strong>Flusser</strong>: <span class="code">Apparatus ∧ Gesture = TechnicalCreativity</span></li>
+            </ul>
+            <h3>Both analyze constrained agency:</h3>
+            <pre class="code">Shared Theorem: ∀x ∈ TechnicalPractice: Programmed(x) ∧ Creative(x)</pre>
+            <p>All technical practices are simultaneously programmed by systems AND creative through human intervention.</p>
+        </div>
+
+        <!-- Slide 9: Meta-Theoretical Implications -->
+        <div class="slide">
+            <h2>Meta-Theoretical Implications</h2>
+            <p>The Spencer-Brown formalization reveals shared logical structures:</p>
+            <ul>
+                <li><strong>1. Identification of false binaries</strong> that appear natural but are actually constructed</li>
+                <li><strong>2. Critical dissolution</strong> of these binaries through theoretical analysis</li>
+                <li><strong>3. Proposal of synthetic categories</strong> that capture the actual complexity of socio-technical relationships</li>
+                <li><strong>4. Maintenance of space for human agency</strong> within systemic constraints</li>
+            </ul>
+        </div>
+
+        <!-- Slide 10: Conclusion / Key Takeaway -->
+        <div class="slide">
+            <h2>Post-Binary Media Theory</h2>
+            <p>Both theorists contribute to approaches that move beyond simple human/technology, natural/artificial, or online/offline distinctions toward more sophisticated dialectical analyses.</p>
+            <h3>The fundamental insight both share is that:</h3>
+            <pre class="code">all experience in technological societies is hybrid</pre>
+            <p>— neither purely human nor purely technical, but constituted through ongoing processes of human-technology entanglement.</p>
+        </div>
+
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        let startX = 0;
+        let endX = 0;
+
+        /**
+         * Displays the slide at the given index and hides others.
+         * Applies 'active' class for styling and transitions.
+         * @param {number} index The index of the slide to show.
+         */
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+        }
+
+        /**
+         * Navigates to the next slide in the presentation.
+         * Wraps around to the first slide if at the end.
+         */
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        /**
+         * Navigates to the previous slide in the presentation.
+         * Wraps around to the last slide if at the beginning.
+         */
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        //
+        // EVENT LISTENERS FOR NAVIGATION
+        //
+
+        // Keyboard navigation (Arrow keys, Spacebar)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+                e.preventDefault(); // Prevent spacebar from scrolling
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+                e.preventDefault(); // Prevent arrow keys from scrolling
+            }
+        });
+
+        // Touch/Swipe navigation for mobile devices
+        const presentationContainer = document.getElementById('presentationContainer');
+        const swipeThreshold = 50; // Minimum pixel distance for a swipe to register
+
+        presentationContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY; // Also track Y for more robust swipe detection
+        }, { passive: true }); // Use passive listener for better scroll performance
+
+        presentationContainer.addEventListener('touchmove', (e) => {
+            endX = e.touches[0].clientX;
+            endY = e.touches[0].clientY;
+        }, { passive: true });
+
+        presentationContainer.addEventListener('touchend', () => {
+            const deltaX = startX - endX;
+            const deltaY = startY - endY;
+
+            // Only consider horizontal swipes, ignore vertical "swipes" (scrolls)
+            if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 0) { // Swiped left
+                    nextSlide();
+                } else { // Swiped right
+                    prevSlide();
+                }
+            }
+            // Reset touch coordinates
+            startX = 0;
+            endX = 0;
+            startY = 0;
+            endY = 0;
+        });
+
+        // Initialize the presentation by showing the first slide
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>

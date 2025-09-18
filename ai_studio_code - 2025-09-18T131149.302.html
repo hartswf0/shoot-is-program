@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spencer-Brown Models of Jurgenson & Flusser</title>
+    <style>
+        /*
+         * GLOBAL STYLES & VARIABLES
+         * Define root variables for consistent theming and basic element styles.
+         */
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #00bcd4; /* Cyan - for emphasis and highlights */
+            --code-bg-color: #333;
+            --code-text-color: #e0e0e0;
+            --main-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --mono-font: 'Fira Code', 'Roboto Mono', 'Courier New', monospace;
+        }
+
+        /*
+         * BODY & PRESENTATION CONTAINER
+         * Full viewport coverage, center content, hide overflow.
+         */
+        body {
+            margin: 0;
+            font-family: var(--main-font);
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            overflow: hidden; /* Hide scrollbars for presentation mode */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            user-select: none; /* Prevent accidental text selection during navigation */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE/Edge */
+        }
+
+        .presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*
+         * SLIDE STYLING
+         * Each slide takes full viewport, hidden by default, with transitions.
+         */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: scale(0.95); /* Slightly scale down when inactive */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1); /* Full scale when active */
+            pointer-events: auto; /* Allow interaction when active */
+        }
+
+        /*
+         * TYPOGRAPHY
+         * Headings, lists, strong text.
+         */
+        h1, h2, h3 {
+            color: var(--accent-color);
+            margin-bottom: 0.5em;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-top: 1em;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            margin-top: 1em;
+            color: var(--text-color); /* Subheadings can be less prominent */
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin: 1em auto;
+            max-width: 80%;
+            font-size: 1.15em;
+        }
+
+        li {
+            margin-bottom: 0.8em;
+            line-height: 1.5;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            max-width: 85%;
+            margin: 1em auto;
+        }
+
+        strong {
+            color: var(--accent-color);
+        }
+
+        /*
+         * CODE & FORMAL NOTATION STYLING
+         * Distinctive styling for code blocks and Spencer-Brown elements.
+         */
+        .code, pre {
+            font-family: var(--mono-font);
+            background-color: var(--code-bg-color);
+            color: var(--code-text-color);
+            padding: 0.8em 1.2em;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 0.5em 0;
+            text-align: left;
+            white-space: pre-wrap; /* Allow long lines to wrap */
+            word-break: break-word;
+            font-size: 0.95em;
+            max-width: 90%;
+        }
+
+        pre {
+            display: block; /* For multi-line code blocks */
+        }
+
+        /* Spencer-Brown specific elements */
+        .sb-box {
+            font-family: var(--mono-font);
+            color: var(--accent-color);
+            font-weight: bold;
+            border: 1px solid var(--accent-color);
+            padding: 2px 4px;
+            margin: 0 2px;
+            display: inline-block;
+        }
+        .sb-operator {
+            font-family: var(--mono-font);
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .sb-notation {
+            font-family: var(--mono-font);
+            font-size: 1em; /* Slightly smaller for the formal part */
+            background-color: #2b2b2b;
+            padding: 0.5em 0.8em;
+            border-left: 3px solid var(--accent-color);
+            margin: 0.8em auto;
+            max-width: 90%;
+            text-align: left;
+            color: var(--code-text-color);
+            display: block;
+        }
+        .sb-notation .concept-description {
+            font-family: var(--main-font); /* Use main font for descriptive text */
+            color: var(--text-color);
+            font-size: 1.05em;
+            margin-bottom: 0.2em;
+        }
+        .sb-notation .formal-expression {
+            color: var(--code-text-color);
+            font-family: var(--mono-font);
+            font-size: 0.9em;
+            margin-top: 0.5em;
+            display: block;
+        }
+
+        /*
+         * RESPONSIVE ADJUSTMENTS
+         * Media queries for various screen sizes (mobile-first approach).
+         */
+        @media (max-width: 1024px) {
+            h1 { font-size: 2.4em; }
+            h2 { font-size: 1.8em; }
+            h3 { font-size: 1.4em; }
+            ul { font-size: 1.05em; max-width: 85%; }
+            p { font-size: 1em; }
+            .code, pre { font-size: 0.9em; max-width: 90%; }
+            .sb-notation { font-size: 0.9em; max-width: 90%; }
+            .sb-notation .concept-description { font-size: 1em; }
+            .sb-notation .formal-expression { font-size: 0.85em; }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+            h3 { font-size: 1.2em; }
+            ul { font-size: 1em; max-width: 90%; }
+            p { font-size: 0.95em; max-width: 90%; }
+            .code, pre { font-size: 0.85em; max-width: 95%; }
+            .sb-notation { font-size: 0.85em; padding: 0.4em 0.6em; max-width: 95%; }
+            .sb-notation .concept-description { font-size: 0.95em; }
+            .sb-notation .formal-expression { font-size: 0.8em; }
+            .slide { padding: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.7em; }
+            h2 { font-size: 1.3em; }
+            h3 { font-size: 1.1em; }
+            ul { font-size: 0.95em; max-width: 95%; }
+            p { font-size: 0.9em; max-width: 95%; }
+            .code, pre { font-size: 0.8em; }
+            .sb-notation { font-size: 0.8em; }
+            .sb-notation .concept-description { font-size: 0.9em; }
+            .sb-notation .formal-expression { font-size: 0.75em; }
+            .slide { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container" id="presentationContainer">
+
+        <!-- Slide 1: Title Slide -->
+        <div class="slide active">
+            <h1>Spencer-Brown Inspired Formal Models</h1>
+            <h2>Jurgenson and Flusser's Arguments</h2>
+            <h3>A Media Studies Perspective</h3>
+        </div>
+
+        <!-- Slide 2: Jurgenson's Primary Distinctions -->
+        <div class="slide">
+            <h2>Jurgenson's Anti-Dualist Framework</h2>
+            <h3>Key Concepts:</h3>
+            <ul>
+                <li><span class="sb-notation"><span class="concept-description">The false belief that online and offline are separate worlds.</span><span class="formal-expression"><span class="sb-box">◻₁</span> Digital Dualism</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">Our integrated, lived reality where digital and physical seamlessly merge.</span><span class="formal-expression"><span class="sb-box">◻₂</span> Augmented Reality</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">The mistaken idea that online and offline are distinct, unconnected states.</span><span class="formal-expression"><span class="sb-box">◻₃</span> Online/Offline Binary</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">An unhealthy obsession with "real life" as superior to digitally-mediated experience.</span><span class="formal-expression"><span class="sb-box">◻₄</span> IRL Fetish</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">Photography evolved into a social communication tool, not just for documentation.</span><span class="formal-expression"><span class="sb-box">◻₅</span> Social Photo</span></span></li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Jurgenson's Morphological Operations -->
+        <div class="slide">
+            <h2>Jurgenson's Anti-Dualist Framework</h2>
+            <h3>How Concepts Transform:</h3>
+            <ul>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Critical Dissolution:</strong> By challenging Digital Dualism, we reveal integrated Augmented Reality.</span>
+                        <span class="formal-expression"><span class="sb-operator">→₁</span> Dualistic Critique: ◻₁ ⊢ ¬◻₁ → ◻₂</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Logical Shift:</strong> Moving from "either/or" thinking to "both/and" thinking about digital and physical.</span>
+                        <span class="formal-expression"><span class="sb-operator">→₂</span> Exclusive to Inclusive Logic: (A ∨ ¬A) → (A ∧ ¬A)</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Therapeutic Resolution:</strong> Overcoming the IRL Fetish allows us to embrace Augmented Reality.</span>
+                        <span class="formal-expression"><span class="sb-operator">→₃</span> Dissolving Disconnection: ◻₄ → ¬◻₄ → ◻₂</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Media Evolution:</strong> Photography transforms from mere documentation to a medium for social communication.</span>
+                        <span class="formal-expression"><span class="sb-operator">→₄</span> Photo's New Role: Documentary photo → Social communication medium</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 4: Flusser's Primary Distinctions -->
+        <div class="slide">
+            <h2>Flusser's Apparatus Theory</h2>
+            <h3>Key Concepts:</h3>
+            <ul>
+                <li><span class="sb-notation"><span class="concept-description">A technological system (e.g., camera) with embedded programs that limit its outputs.</span><span class="formal-expression"><span class="sb-box">■₁</span> Apparatus</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">A human's creative, unprogrammed interaction with the apparatus.</span><span class="formal-expression"><span class="sb-box">■₂</span> Human Gesture</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">The pre-set rules or possibilities within an apparatus that *appear* to offer freedom but are constrained.</span><span class="formal-expression"><span class="sb-box">■₃</span> Program</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">The ability to "outwit" or creatively manipulate the apparatus's programmed limits.</span><span class="formal-expression"><span class="sb-box">■₄</span> Freedom</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">Images that represent abstract concepts rather than directly showing the world.</span><span class="formal-expression"><span class="sb-box">■₅</span> Technical Image</span></span></li>
+                <li><span class="sb-notation"><span class="concept-description">A cybernetic condition where constant feedback loops replace linear historical progression.</span><span class="formal-expression"><span class="sb-box">■₆</span> Post-History</span></span></li>
+            </ul>
+        </div>
+
+        <!-- Slide 5: Flusser's Morphological Operations -->
+        <div class="slide">
+            <h2>Flusser's Apparatus Theory</h2>
+            <h3>How Concepts Transform:</h3>
+            <ul>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Creative Intervention:</strong> Human gesture transforms the apparatus, making its operation creative.</span>
+                        <span class="formal-expression"><span class="sb-operator">⟶₁</span> Gestural Intervention: ■₁ ⊢ ■₂ → (■₁ ∧ ■₂)</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Program Resistance:</strong> The photographer moves from following the program to creatively outwitting it.</span>
+                        <span class="formal-expression"><span class="sb-operator">⟶₂</span> Outwitting the Program: ■₃ → ¬■₃ → ■₄</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Media Epochs:</strong> Tracing the evolution of communication from mythic to linear to cybernetic.</span>
+                        <span class="formal-expression"><span class="sb-operator">⟶₃</span> Historical Progression: Magic → History → PostHistory</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Dynamic Interaction:</strong> A continuous, back-and-forth feedback loop between the apparatus and the operator.</span>
+                        <span class="formal-expression"><span class="sb-operator">⟶₄</span> Apparatus-Operator Feedback: ■₁ ⟷ ■₂ → ■₁∪■₂</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 6: Categorical Structure (OLOG Framework) -->
+        <div class="slide">
+            <h2>Categorical Structure (OLOG Framework)</h2>
+            <h3>Key Elements (Objects):</h3>
+            <ul>
+                <li><strong>E (Experience):</strong> Our lived reality as a blend of digital and physical.</li>
+                <li><strong>T (Technology):</strong> The technical systems and tools we use.</li>
+                <li><strong>H (Human Agency):</strong> Our creative choices and resistance within systems.</li>
+                <li><strong>S (Social Practice):</strong> Meaningful cultural activities and interactions.</li>
+            </ul>
+            <h3>Connecting Relationships (Morphisms):</h3>
+            <ul>
+                <li><span class="code">Experience is mediated by Technology: E → T</span></li>
+                <li><span class="code">Technology enables (and constrains) Human Agency: T → H</span></li>
+                <li><span class="code">Human Agency creates Social Practices: H → S</span></li>
+                <li><span class="code">Social Practices shape our Experience: S → E</span></li>
+            </ul>
+            <h3>Circular Co-determination:</h3>
+            <pre class="code">E → T → H → S → E</pre>
+            <p>This diagram illustrates the constant, reciprocal influence among these elements in our techno-social world.</p>
+        </div>
+
+        <!-- Slide 7: Convergent Logical Structures - Anti-Binary Critiques -->
+        <div class="slide">
+            <h2>Convergent Logical Structures</h2>
+            <h3>Both theorists reject "either/or" thinking:</h3>
+            <ul>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Jurgenson:</strong> It's not "online OR offline." Our reality is always integrated Augmented Reality.</span>
+                        <span class="formal-expression">¬(Online ∨ Offline) → AugmentedReality</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Flusser:</strong> It's not "human OR machine." We exist in an inseparable Apparatus Complex.</span>
+                        <span class="formal-expression">¬(Human ∨ Machine) → ApparatusComplex</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 8: Convergent Logical Structures - Dialectical Resolutions & Constrained Agency -->
+        <div class="slide">
+            <h2>Convergent Logical Structures (cont.)</h2>
+            <h3>Both propose new syntheses:</h3>
+            <ul>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Jurgenson:</strong> The Digital AND the Physical combine to form an Integrated Experience.</span>
+                        <span class="formal-expression">Digital ∧ Physical = IntegratedExperience</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="sb-notation">
+                        <span class="concept-description"><strong>Flusser:</strong> The Apparatus AND Human Gesture result in Technical Creativity.</span>
+                        <span class="formal-expression">Apparatus ∧ Gesture = TechnicalCreativity</span>
+                    </span>
+                </li>
+            </ul>
+            <h3>Both recognize agency within systems:</h3>
+            <pre class="code">Shared Theorem: Every technical practice is simultaneously Programmed AND Creative.</pre>
+            <p>Our engagement with technology always involves both following its rules and finding ways to express ourselves creatively within (or against) them.</p>
+        </div>
+
+        <!-- Slide 9: Meta-Theoretical Implications -->
+        <div class="slide">
+            <h2>Meta-Theoretical Implications</h2>
+            <p>This formal modeling reveals shared patterns in Jurgenson and Flusser's theories:</p>
+            <ul>
+                <li><strong>1. Identifying False Binaries:</strong> They expose distinctions that seem natural but are constructed.</li>
+                <li><strong>2. Dissolving Binaries:</strong> They break down these false separations through critical analysis.</li>
+                <li><strong>3. Proposing New Categories:</strong> They offer complex, integrated concepts for socio-technical relationships.</li>
+                <li><strong>4. Preserving Human Agency:</strong> They emphasize human creativity and resistance even within systemic constraints.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 10: Conclusion / Key Takeaway -->
+        <div class="slide">
+            <h2>Post-Binary Media Theory</h2>
+            <p>Both theorists lay foundations for understanding media beyond simple "human vs. technology" or "online vs. offline" divides.</p>
+            <h3>Their fundamental shared insight:</h3>
+            <pre class="code">All experience in technological societies is hybrid.</pre>
+            <p>It's never purely human nor purely technical, but a continuous interplay of human-technology entanglement.</p>
+        </div>
+
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        let startX = 0;
+        let endX = 0;
+        let startY = 0; // Added for more robust swipe detection
+        let endY = 0;   // Added for more robust swipe detection
+
+
+        /**
+         * Displays the slide at the given index and hides others.
+         * Applies 'active' class for styling and transitions.
+         * @param {number} index The index of the slide to show.
+         */
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+        }
+
+        /**
+         * Navigates to the next slide in the presentation.
+         * Wraps around to the first slide if at the end.
+         */
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        /**
+         * Navigates to the previous slide in the presentation.
+         * Wraps around to the last slide if at the beginning.
+         */
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        //
+        // EVENT LISTENERS FOR NAVIGATION
+        //
+
+        // Keyboard navigation (Arrow keys, Spacebar)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+                e.preventDefault(); // Prevent spacebar from scrolling
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+                e.preventDefault(); // Prevent arrow keys from scrolling
+            }
+        });
+
+        // Touch/Swipe navigation for mobile devices
+        const presentationContainer = document.getElementById('presentationContainer');
+        const swipeThreshold = 50; // Minimum pixel distance for a swipe to register
+
+        presentationContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY; // Also track Y for more robust swipe detection
+        }, { passive: true }); // Use passive listener for better scroll performance
+
+        presentationContainer.addEventListener('touchmove', (e) => {
+            endX = e.touches[0].clientX;
+            endY = e.touches[0].clientY;
+        }, { passive: true });
+
+        presentationContainer.addEventListener('touchend', () => {
+            const deltaX = startX - endX;
+            const deltaY = startY - endY;
+
+            // Only consider horizontal swipes if they are significantly larger than vertical movement
+            if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) { // 1.5 factor for robustness
+                if (deltaX > 0) { // Swiped left
+                    nextSlide();
+                } else { // Swiped right
+                    prevSlide();
+                }
+            }
+            // Reset touch coordinates
+            startX = 0;
+            endX = 0;
+            startY = 0;
+            endY = 0;
+        });
+
+        // Initialize the presentation by showing the first slide
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>

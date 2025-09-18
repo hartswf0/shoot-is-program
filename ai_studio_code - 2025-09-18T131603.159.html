@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flusser's Photography - Presentation</title>
+    <style>
+        /* General Resets & Variables */
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2a2a2a;
+            --text-color: #e0e0e0;
+            --accent-color: #6a9cff;
+            --font-family-primary: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-family-secondary: 'Georgia', serif;
+            --font-size-base: 1.8vw; /* Responsive base font size */
+            --padding-base: 2vh;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            color: var(--text-color);
+            background-color: var(--primary-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-size: var(--font-size-base);
+            line-height: 1.4;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--padding-base);
+            position: relative;
+            background-color: var(--secondary-bg);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .slide-wrapper {
+            width: 100%;
+            height: calc(100% - 12vh); /* Adjust for controls */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .slide {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background-color: var(--primary-bg);
+            border-radius: 10px;
+            padding: calc(var(--padding-base) * 2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            text-align: left;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            overflow-y: auto;
+            max-height: 90%; /* Ensure content doesn't overflow slide area */
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .main-title {
+            font-size: calc(var(--font-size-base) * 2);
+            color: var(--accent-color);
+            text-align: center;
+            width: 100%;
+            font-family: var(--font-family-secondary);
+        }
+
+        .slide-subtitle {
+            font-size: calc(var(--font-size-base) * 1.2);
+            color: #c0c0c0;
+            text-align: center;
+            width: 100%;
+            margin-top: calc(var(--padding-base) * 0.5);
+        }
+
+        .platform-title {
+            font-size: calc(var(--font-size-base) * 1.8);
+            color: var(--accent-color);
+            margin-bottom: var(--padding-base);
+            text-align: center;
+            width: 100%;
+            font-family: var(--font-family-secondary);
+        }
+
+        .one-line-summary {
+            font-size: calc(var(--font-size-base) * 1.2);
+            color: #e0e0e0;
+            text-align: center;
+            width: 100%;
+            margin-bottom: calc(var(--padding-base) * 1.5);
+        }
+
+        .segment-title {
+            font-size: calc(var(--font-size-base) * 1.3);
+            color: var(--accent-color);
+            margin-bottom: calc(var(--padding-base) * 0.7);
+            text-align: center;
+            width: 100%;
+            font-family: var(--font-family-secondary);
+        }
+
+        .slide-content ul {
+            list-style: none;
+            padding-left: 0;
+            width: 100%;
+            text-align: left;
+            margin-bottom: var(--padding-base);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .slide-content li {
+            margin-bottom: calc(var(--padding-base) * 0.7);
+            padding-left: 1.5em;
+            position: relative;
+            font-size: calc(var(--font-size-base) * 0.95);
+        }
+
+        .slide-content li::before {
+            content: '•';
+            color: var(--accent-color);
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+            line-height: 1;
+        }
+
+        .slide-content code {
+            background-color: #333;
+            color: #ffd700; /* Gold-like for entities */
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: calc(var(--font-size-base) * 0.9);
+            white-space: nowrap;
+        }
+
+        .slide-content em {
+            color: var(--accent-color);
+            font-style: normal;
+            font-weight: bold;
+        }
+
+        .sitemap pre {
+            background-color: #000;
+            color: #0f0; /* Green for code */
+            padding: var(--padding-base);
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            font-size: calc(var(--font-size-base) * 0.8);
+            margin-top: var(--padding-base);
+            width: 90%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Example Section Styling */
+        .example-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            margin: calc(var(--padding-base) * 1.5) auto 0 auto;
+            padding-top: var(--padding-base);
+            border-top: 1px solid #444;
+        }
+
+        .example-title {
+            font-size: calc(var(--font-size-base) * 1.1);
+            color: var(--accent-color);
+            margin-bottom: calc(var(--padding-base) * 0.5);
+            text-align: center;
+            width: 100%;
+        }
+
+        .example-text {
+            font-size: calc(var(--font-size-base) * 0.9);
+            color: #c0c0c0;
+            text-align: center;
+            margin-bottom: var(--padding-base);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 20vh; /* Fixed height for image area */
+            background-color: #333;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: calc(var(--padding-base) * 0.5);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Maintain aspect ratio */
+        }
+
+        .icon-placeholder {
+            font-size: calc(var(--font-size-base) * 3);
+            color: #888;
+        }
+
+        .image-input-group {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 0.5vh;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .image-url-input {
+            background-color: #444;
+            color: var(--text-color);
+            border: 1px solid #666;
+            padding: 0.8vh 1.5vw;
+            border-radius: 5px;
+            font-size: calc(var(--font-size-base) * 0.8);
+            flex-grow: 1;
+            min-width: 150px; /* Ensure input is usable on mobile */
+        }
+
+        .image-input-group button {
+            padding: 0.8vh 1.5vw;
+            font-size: calc(var(--font-size-base) * 0.75);
+            min-width: 80px;
+            flex-grow: 0; /* Prevent buttons from stretching too much */
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin-top: var(--padding-base);
+            gap: 1vh;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            padding: 1.5vh 2.5vw;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: calc(var(--font-size-base) * 0.85);
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            flex-grow: 1;
+            min-width: 120px;
+        }
+
+        button:hover {
+            background-color: #8ab7ff;
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            color: #ccc;
+        }
+
+        .slide-indicator {
+            color: var(--text-color);
+            font-size: calc(var(--font-size-base) * 0.9);
+            text-align: center;
+            width: 100%;
+            margin-top: calc(var(--padding-base) * 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            body {
+                font-size: 3.5vw;
+            }
+
+            .slide {
+                width: 95%;
+                height: 95%;
+                padding: var(--padding-base);
+            }
+
+            .main-title { font-size: calc(3.5vw * 2); }
+            .slide-subtitle { font-size: calc(3.5vw * 1.2); }
+            .platform-title { font-size: calc(3.5vw * 1.8); }
+            .one-line-summary { font-size: calc(3.5vw * 1.2); }
+            .segment-title { font-size: calc(3.5vw * 1.3); }
+            .slide-content li { font-size: calc(3.5vw * 0.95); }
+            .slide-content code { font-size: calc(3.5vw * 0.9); }
+            .sitemap pre { font-size: calc(3.5vw * 0.8); }
+
+            .example-section {
+                width: 100%;
+                margin-top: var(--padding-base);
+                padding-top: var(--padding-base);
+            }
+            .example-title { font-size: calc(3.5vw * 1.1); }
+            .example-text { font-size: calc(3.5vw * 0.9); }
+            .image-placeholder { height: 15vh; }
+            .icon-placeholder { font-size: calc(3.5vw * 3); }
+            .image-url-input { font-size: calc(3.5vw * 0.8); }
+            .image-input-group button { font-size: calc(3.5vw * 0.75); flex-basis: 48%; }
+
+            .controls {
+                flex-direction: row;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                width: 95%;
+                margin-top: 1vh;
+            }
+
+            button {
+                padding: 1.5vh 3vw;
+                font-size: calc(3.5vw * 0.85);
+                flex-basis: 48%;
+            }
+
+            .slide-indicator {
+                font-size: calc(3.5vw * 0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+        <div class="slide-wrapper">
+
+            <!-- Title Slide -->
+            <div class="slide" data-slide-index="0">
+                <div class="slide-content">
+                    <h1 class="main-title">Flusser-Model — 4 Platforms in Entities & Morphisms</h1>
+                    <p class="slide-subtitle">Unpacking the Code of Photography and Reality</p>
+                    <p class="voiceover-text hidden">Welcome to Flusser Model, four platforms defined by entities and morphisms. Unpacking the code of photography and reality.</p>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- PLATFORM 1: The Apparatus as a "Super-Black-Box" -->
+            <!-- ============================================== -->
+
+            <div class="slide" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="platform-title">1) &lt;Apparatus&gt; as &lt;Super-Black-Box&gt;</h2>
+                    <p class="one-line-summary">Reality is produced by nested programs; humans operate as functionaries at the edges.</p>
+                    <p class="voiceover-text hidden">Platform one: The Apparatus as a Super Black Box. Reality is produced by nested programs; humans operate as functionaries at the edges.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="2">
+                <div class="slide-content">
+                    <h3 class="segment-title">Entities of the Apparatus</h3>
+                    <ul>
+                        <li><code>&lt;Apparatus&gt;</code>: a programmed <code>&lt;black-box&gt;</code>.</li>
+                        <li><code>&lt;Program&gt;</code>: finite but vast <code>&lt;rule-set&gt;</code>.</li>
+                        <li><code>&lt;Metaprogram&gt;</code>: higher-order <code>&lt;rule-set&gt;</code> that constrains <code>&lt;program&gt;</code>.</li>
+                        <li><code>&lt;Functionary&gt;</code>: human operator at I/O.</li>
+                        <li><code>&lt;Output-World&gt;</code>: perceived “reality” generated by apparatuses.</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Smartphone Social Media</h4>
+                        <p class="example-text">A smartphone (<code>&lt;Apparatus&gt;</code>) running a social media app (its <code>&lt;Program&gt;</code>). The user scrolls (<code>&lt;Functionary&gt;</code>), ignorant of algorithms (<code>&lt;Internal-State&gt;</code>) that curate the feed (<code>&lt;Output-World&gt;</code>).</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Smartphone Social Media Feed" class="slide-image hidden">
+                            <span class="icon-placeholder">📱</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Entities of the Apparatus include: The Apparatus itself, a programmed black box. The Program, a finite but vast rule set. The Metaprogram, a higher-order rule set that constrains the program. The Functionary, a human operator at input/output. And the Output World, our perceived reality generated by these apparatuses. For example, a smartphone running a social media app illustrates these entities. The user is a functionary, scrolling through an output world generated by a program, whose internal state, the algorithm, remains hidden within the black box of the apparatus.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="3">
+                <div class="slide-content">
+                    <h3 class="segment-title">Morphisms of the Apparatus</h3>
+                    <ul>
+                        <li><code>[generates]</code>: <code>&lt;Apparatus&gt;</code> × <code>&lt;Program&gt;</code> → <code>&lt;Output-World&gt;</code></li>
+                        <li><code>[constrains]</code>: <code>&lt;Metaprogram&gt;</code> → <code>&lt;Program&gt;</code></li>
+                        <li><code>[operates]</code>: <code>&lt;Functionary&gt;</code> → <code>&lt;Apparatus&gt;</code></li>
+                        <li><code>[hides]</code>: <code>&lt;Black-Box&gt;</code> → <code>&lt;Internal-State&gt;</code></li>
+                        <li><code>[shifts-power-to]</code>: <code>&lt;Software&gt;</code> → <code>&lt;Programmer&gt;</code></li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Google Search Engine</h4>
+                        <p class="example-text">Google's search engine (<code>&lt;Apparatus&gt;</code> + <code>&lt;Program&gt;</code>) [generates] a results page (<code>&lt;Output-World&gt;</code>). Data privacy laws (<code>&lt;Metaprogram&gt;</code>) [constrain] its development. An engineer (<code>&lt;Programmer&gt;</code>) [shifts-power-to] themselves over its <code>&lt;Software&gt;</code>.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Google Search Results" class="slide-image hidden">
+                            <span class="icon-placeholder">🔎</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Morphisms define their interactions: The Apparatus, combined with its Program, generates the Output World. A Metaprogram constrains the Program. A Functionary operates the Apparatus. The Black Box hides its Internal State. And power shifts to the Programmer through the Software. For example, Google's search engine generates a results page, constrained by data privacy laws. The engineer holds power over its software.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="4">
+                <div class="slide-content">
+                    <h3 class="segment-title">Sitemap: Super-Black-Box Structure</h3>
+                    <div class="sitemap">
+<pre>
+&lt;Super-Black-Box&gt;
+├── &lt;Metaprogram&gt; [constrains] &lt;Program&gt;
+├── &lt;Apparatus&gt; [generates] &lt;Output-World&gt;
+│   └── &lt;Black-Box&gt; [hides] &lt;Internal-State&gt;
+└── &lt;Functionary&gt; [operates] &lt;Apparatus&gt;
+</pre>
+                    </div>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: City Traffic System</h4>
+                        <p class="example-text">A city's traffic light system (<code>&lt;Apparatus&gt;</code>). City council policy (<code>&lt;Metaprogram&gt;</code>) [constrains] the signals' timing (<code>&lt;Program&gt;</code>) to control traffic flow (<code>&lt;Output-World&gt;</code>). Drivers (<code>&lt;Functionary&gt;</code>) simply obey.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="City Traffic Lights" class="slide-image hidden">
+                            <span class="icon-placeholder">🚦</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">The Super Black Box reveals its nested structure: Metaprograms constrain Programs. The Apparatus generates our Output World, with its Black Box hiding its Internal State. And the Functionary operates the Apparatus. Think of a city traffic system: policy constrains signal timing, which controls traffic, and drivers simply obey the apparatus.</p>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- PLATFORM 2: Technical Image's "Magic of Objectivity" -->
+            <!-- ============================================== -->
+
+            <div class="slide" data-slide-index="5">
+                <div class="slide-content">
+                    <h2 class="platform-title">2) &lt;Technical-Image&gt; and the “Magic of Objectivity”</h2>
+                    <p class="one-line-summary">Photos look objective but actually encode theories and programs.</p>
+                    <p class="voiceover-text hidden">Platform two: The Technical Image and the Magic of Objectivity. Photos look objective but actually encode theories and programs.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="6">
+                <div class="slide-content">
+                    <h3 class="segment-title">Entities of the Technical Image</h3>
+                    <ul>
+                        <li><code>&lt;Technical-Image&gt;</code>: third-order <code>&lt;abstraction&gt;</code> (texts → programs → images).</li>
+                        <li><code>&lt;Concepts/Text&gt;</code>: scientific/theoretical inputs.</li>
+                        <li><code>&lt;Surface&gt;</code>: medium that carries the image.</li>
+                        <li><code>&lt;Viewer&gt;</code>: decoder/recipient.</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Weather Map Graphic</h4>
+                        <p class="example-text">A weather map graphic (<code>&lt;Technical-Image&gt;</code>) is an abstraction of meteorological data (<code>&lt;Concepts/Text&gt;</code>) rendered on a screen (<code>&lt;Surface&gt;</code>). A user (<code>&lt;Viewer&gt;</code>) interprets it.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Weather Map" class="slide-image hidden">
+                            <span class="icon-placeholder">☁️</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Entities of the Technical Image: The Technical Image itself, a third-order abstraction. Concepts or Text, which are scientific or theoretical inputs. The Surface, the medium carrying the image. And the Viewer, who is the decoder or recipient. A weather map graphic exemplifies this: it's a technical image, an abstraction of meteorological data, rendered on a screen, and interpreted by a viewer.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="7">
+                <div class="slide-content">
+                    <h3 class="segment-title">Morphisms of the Technical Image</h3>
+                    <ul>
+                        <li><code>[encodes]</code>: <code>&lt;Concepts/Text&gt;</code> → <code>&lt;Technical-Image&gt;</code></li>
+                        <li><code>[renders-as]</code>: <code>&lt;Program&gt;</code> → <code>&lt;Surface&gt;</code></li>
+                        <li><code>[appears-as-objective]</code>: <code>&lt;Technical-Image&gt;</code> → <code>&lt;Viewer&gt;</code></li>
+                        <li><code>[must-be-decoded]</code>: <code>&lt;Viewer&gt;</code> → <code>&lt;Concepts/Text&gt;</code></li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: MRI Scan</h4>
+                        <p class="example-text">An MRI scan (<code>&lt;Technical-Image&gt;</code>) [encodes] complex medical theories (<code>&lt;Concepts/Text&gt;</code>). To a doctor, it [appears-as-objective]. For deeper understanding, the doctor [must-be-decoded] the image by applying medical knowledge.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="MRI Scan" class="slide-image hidden">
+                            <span class="icon-placeholder">🧠</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Morphisms for the Technical Image: Concepts or Text encode the Technical Image. A Program renders to a Surface. The Technical Image appears as objective to the Viewer. And critically, the Viewer must decode the image back to Concepts or Text. An MRI scan, for example, encodes medical theories, appears objective to a doctor, but must be decoded using their knowledge.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="8">
+                <div class="slide-content">
+                    <h3 class="segment-title">Sitemap: Image as Abstraction</h3>
+                    <div class="sitemap">
+<pre>
+&lt;Technical-Image&gt;
+├── &lt;Concepts/Text&gt; [encodes] → &lt;Image-Program&gt; [renders-as] → &lt;Surface&gt;
+└── &lt;Viewer&gt;
+    ├── (naïve) [appears-as-objective]
+    └── (critical) [must-be-decoded] → &lt;Concepts/Text&gt;
+</pre>
+                    </div>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Filtered Instagram Selfie</h4>
+                        <p class="example-text">A highly filtered Instagram selfie (<code>&lt;Technical-Image&gt;</code>). The filters are programs encoding aesthetic ideals (<code>&lt;Concepts/Text&gt;</code>). A naïve viewer sees "reality," while a critical viewer recognizes the encoded beauty standards.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Filtered Selfie" class="slide-image hidden">
+                            <span class="icon-placeholder">✨</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">The Technical Image, a complex abstraction: Concepts encode an Image Program, which renders to a Surface. A naive Viewer sees it as objective, but a critical Viewer must decode it to the underlying Concepts. Consider a filtered Instagram selfie: the filters encode aesthetic ideals. A naive viewer sees reality, while a critical viewer recognizes the encoded beauty standards.</p>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- PLATFORM 3: Freedom as Playing-Against-The-Program -->
+            <!-- ============================================== -->
+
+            <div class="slide" data-slide-index="9">
+                <div class="slide-content">
+                    <h2 class="platform-title">3) &lt;Freedom&gt; as [Playing-Against-The-Program]</h2>
+                    <p class="one-line-summary">Human freedom = creating improbable, informative moves inside (and against) the program.</p>
+                    <p class="voiceover-text hidden">Platform three: Freedom as Playing Against the Program. Human freedom means creating improbable, informative moves inside and against the program.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="10">
+                <div class="slide-content">
+                    <h3 class="segment-title">Entities of Freedom</h3>
+                    <ul>
+                        <li><code>&lt;Photographer&gt;</code>: <code>&lt;player&gt;</code> not worker.</li>
+                        <li><code>&lt;Camera-Program&gt;</code>: finite move-set.</li>
+                        <li><code>&lt;Informative-Image&gt;</code>: improbable output (low redundancy).</li>
+                        <li><code>&lt;Quantum-Doubt&gt;</code>: micro-hesitations/decisions.</li>
+                        <li><code>&lt;Metaprogram-Design&gt;</code>: redesign of the rules themselves.</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Experimental Photographer</h4>
+                        <p class="example-text">An experimental photographer (<code>&lt;Photographer&gt;</code>) intentionally uses a broken lens (disrupted <code>&lt;Camera-Program&gt;</code>) to create abstract, unique photos (<code>&lt;Informative-Image&gt;</code>).</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Abstract Photo" class="slide-image hidden">
+                            <span class="icon-placeholder">🎭</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Entities of Freedom: The Photographer, who is a player not a worker. The Camera Program, a finite move set. An Informative Image, an improbable output with low redundancy. Quantum Doubt, which are micro-hesitations and decisions. And Metaprogram Design, the redesign of the rules themselves. An experimental photographer using a broken lens to create unique photos demonstrates these entities.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="11">
+                <div class="slide-content">
+                    <h3 class="segment-title">Morphisms of Freedom</h3>
+                    <ul>
+                        <li><code>[plays-against]</code>: <code>&lt;Photographer&gt;</code> → <code>&lt;Camera-Program&gt;</code></li>
+                        <li><code>[produces]</code>: <code>&lt;Play&gt;</code> → <code>&lt;Informative-Image&gt;</code></li>
+                        <li><code>[navigates-via]</code>: <code>&lt;Photographer&gt;</code> → <code>&lt;Quantum-Doubt&gt;</code></li>
+                        <li><code>[smuggles-intent-into]</code>: <code>&lt;Photographer&gt;</code> → <code>&lt;Program&gt;</code></li>
+                        <li><code>[escalates-to]</code>: <code>&lt;Play&gt;</code> → <code>&lt;Metaprogram-Design&gt;</code></li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Photojournalist in Conflict</h4>
+                        <p class="example-text">A photojournalist (<code>&lt;Photographer&gt;</code>) covering a conflict, making split-second decisions (<code>&lt;Quantum-Doubt&gt;</code>) about framing to capture an impactful image (<code>&lt;Informative-Image&gt;</code>) that defies typical news tropes.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Photojournalistic Shot" class="slide-image hidden">
+                            <span class="icon-placeholder">🕊️</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Morphisms for Freedom: The Photographer plays against the Camera Program. Play produces an Informative Image. The Photographer navigates via Quantum Doubt. The Photographer smuggles intent into the Program. And Play escalates to Metaprogram Design. A photojournalist in a conflict zone exemplifies this, making split-second decisions to capture an informative image that defies typical news tropes.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="12">
+                <div class="slide-content">
+                    <h3 class="segment-title">Sitemap: Freedom as Play</h3>
+                    <div class="sitemap">
+<pre>
+&lt;Freedom&gt;
+├── &lt;Photographer&gt; [plays-against] &lt;Camera-Program&gt;
+│   └── [navigates-via] &lt;Quantum-Doubt&gt;
+├── &lt;Play&gt; [produces] &lt;Informative-Image&gt;
+└── &lt;Play&gt; [escalates-to] &lt;Metaprogram-Design&gt;
+</pre>
+                    </div>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Open-Source Camera Software</h4>
+                        <p class="example-text">A collective of artists collaborating on open-source camera software (<code>&lt;Metaprogram-Design&gt;</code>) to empower photographers with creative control, illustrating <code>&lt;Freedom&gt;</code>.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Open-Source Camera" class="slide-image hidden">
+                            <span class="icon-placeholder">🛠️</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Freedom emerges as a dynamic interplay: The Photographer plays against the Camera Program, navigating via Quantum Doubt. This Play produces Informative Images and can escalate to Metaprogram Design. An example is a collective creating open-source camera software, empowering photographers with creative control.</p>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- PLATFORM 4: Distribution-Channel as Encoder of Significance -->
+            <!-- ============================================== -->
+
+            <div class="slide" data-slide-index="13">
+                <div class="slide-content">
+                    <h2 class="platform-title">4) &lt;Distribution-Channel&gt; as Encoder of Significance</h2>
+                    <p class="one-line-summary">Meaning is assigned downstream; channels program reception.</p>
+                    <p class="voiceover-text hidden">Platform four: The Distribution Channel as Encoder of Significance. Meaning is assigned downstream; channels program reception.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="14">
+                <div class="slide-content">
+                    <h3 class="segment-title">Entities of Distribution</h3>
+                    <ul>
+                        <li><code>&lt;Distribution-Channel&gt;</code>: scientific / political / commercial / artistic pipelines.</li>
+                        <li><code>&lt;Photograph&gt;</code>: portable <code>&lt;carrier&gt;</code> of potential meanings.</li>
+                        <li><code>&lt;Encoded-Significance&gt;</code>: role the image takes in a channel.</li>
+                        <li><code>&lt;Audience&gt;</code>: targeted receivers.</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Scientific Discovery Image</h4>
+                        <p class="example-text">A photograph of a scientific discovery (<code>&lt;Photograph&gt;</code>) can be published in a peer-reviewed journal (<code>&lt;Distribution-Channel₁&gt;</code>) as scientific proof, or in a popular science magazine (<code>&lt;Distribution-Channel₂&gt;</code>) to inspire the public.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Microscopic Image" class="slide-image hidden">
+                            <span class="icon-placeholder">🔬</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Entities of Distribution: The Distribution Channel, which are pipelines like scientific or artistic. The Photograph, a portable carrier of potential meanings. The Encoded Significance, the role the image takes in a channel. And the Audience, targeted receivers. For example, a scientific discovery image can be published in a journal as proof, or in a popular magazine to inspire.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="15">
+                <div class="slide-content">
+                    <h3 class="segment-title">Morphisms of Distribution</h3>
+                    <ul>
+                        <li><code>[re-signifies]</code>: <code>&lt;Distribution-Channel&gt;</code> × <code>&lt;Photograph&gt;</code> → <code>&lt;Encoded-Significance&gt;</code></li>
+                        <li><code>[anticipates]</code>: <code>&lt;Photographer&gt;</code> → <code>&lt;Distribution-Channel&gt;</code></li>
+                        <li><code>[programs]</code>: <code>&lt;Channel&gt;</code> → <code>&lt;Audience-Perception&gt;</code></li>
+                        <li><code>[conflicts-with]</code>: <code>&lt;Photographer-Intention&gt;</code> ↔ <code>&lt;Channel-Program&gt;</code></li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Political Protest Image</h4>
+                        <p class="example-text">A politically charged image (<code>&lt;Photograph&gt;</code>) published by a partisan news outlet (<code>&lt;Distribution-Channel&gt;</code>) [re-signifies] the image as a call to action (<code>&lt;Encoded-Significance&gt;</code>), aiming to [program] its <code>&lt;Audience-Perception&gt;</code>.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Political Protest" class="slide-image hidden">
+                            <span class="icon-placeholder">📣</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Morphisms for Distribution: The Distribution Channel, with the Photograph, re-signifies into Encoded Significance. The Photographer anticipates the Distribution Channel. The Channel programs Audience Perception. And Photographer Intention often conflicts with the Channel Program. A politically charged image published by a partisan news outlet re-signifies as a call to action, programming audience perception.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="16">
+                <div class="slide-content">
+                    <h3 class="segment-title">Sitemap: Distribution Field</h3>
+                    <div class="sitemap">
+<pre>
+&lt;Distribution-Field&gt;
+├── &lt;Photograph&gt;
+│   └── &lt;Channel₁…ₙ&gt; [re-signifies] → &lt;Encoded-Significance₁…ₙ&gt;
+└── &lt;Audience&gt; ⇐ [programs] &lt;Channel&gt;
+</pre>
+                    </div>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Product Advertising Campaign</h4>
+                        <p class="example-text">A corporate ad campaign (<code>&lt;Distribution-Field&gt;</code>) uses a product photo (<code>&lt;Photograph&gt;</code>) across social media, billboards, and TV (<code>&lt;Channel₁…ₙ&gt;</code>). Each [re-signifies] the product as desirable to its target <code>&lt;Audience&gt;</code>.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Product Advertisement" class="slide-image hidden">
+                            <span class="icon-placeholder">📺</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">The Distribution Field, a network of signification: A Photograph flows through various Channels, each re-signifying it into specific Encoded Significance. This Channel then programs the Audience's perception. For instance, a product advertising campaign uses a photo across multiple channels, each re-signifying the product as desirable to its audience.</p>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- Crosswalk & Ultra-Compact Slides -->
+            <!-- ============================================== -->
+
+            <div class="slide" data-slide-index="17">
+                <div class="slide-content">
+                    <h3 class="segment-title">Crosswalk: Flusser → Your System Kit</h3>
+                    <ul>
+                        <li><code>&lt;Universe&gt;</code> ←→ <code>&lt;Super-Black-Box&gt;</code> of apparatuses</li>
+                        <li><code>&lt;Engine&gt;/&lt;Transform&gt;</code> ←→ <code>&lt;Program&gt;</code>/<code>&lt;Metaprogram&gt;</code> [constrains]</li>
+                        <li><code>&lt;Window&gt;/&lt;Lattice&gt;</code> ←→ <code>&lt;Technical-Image&gt;</code>/<code>&lt;Channel&gt;</code> (what’s shown/how it’s routed)</li>
+                        <li><code>&lt;Model&gt;/&lt;Reality&gt;/&lt;Metric&gt;</code>←→ <code>&lt;Informative-Image&gt;</code> vs redundancy (novelty as metric)</li>
+                        <li><code>&lt;Recursion&gt;/&lt;Fixed-Point&gt;</code> ←→ Channel feedback loops & program refinement</li>
+                        <li><code>&lt;Functionary&gt;</code> ←→ Photographer-as-player (<code>Homo ludens</code>)</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Mapping Flusser to AI</h4>
+                        <p class="example-text">Flusser's <code>&lt;Apparatus&gt;</code> functions like an <code>&lt;Engine&gt;</code> or <code>&lt;Transform&gt;</code> in an AI system, demonstrating how his ideas are reusable across different models.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Conceptual Map" class="slide-image hidden">
+                            <span class="icon-placeholder">↔️</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">This crosswalk maps Flusser's concepts to your general system kit. The Universe equates to the Super Black Box of apparatuses. Engine or Transform aligns with Program and Metaprogram constraints. Window or Lattice corresponds to Technical Image or Channel. Model, Reality, or Metric relate to Informative Images versus redundancy. Recursion or Fixed Point refers to Channel feedback loops. And Functionary is the Photographer as player, Homo Ludens. Mapping Flusser's apparatus to an AI system's engine shows his ideas are reusable across models.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="18">
+                <div class="slide-content">
+                    <h3 class="segment-title">Ultra-Compact: Apparatus</h3>
+                    <ul>
+                        <li><strong>Apparatus = Programs all the way down.</strong> <code>&lt;Metaprogram&gt;</code> [constrains] <code>&lt;Program&gt;</code>; <code>&lt;Apparatus&gt;</code> [generates] <code>&lt;Output-World&gt;</code>; <code>&lt;Functionary&gt;</code> stays at I/O.</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Self-Driving Car AI</h4>
+                        <p class="example-text">A self-driving car's AI (<code>&lt;Apparatus&gt;</code>) is constrained by traffic laws (<code>&lt;Metaprogram&gt;</code>), generating driving actions (<code>&lt;Output-World&gt;</code>).</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Self-Driving Car" class="slide-image hidden">
+                            <span class="icon-placeholder">🚗</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Apparatus equals Programs all the way down. Metaprogram constrains Program. Apparatus generates Output World. Functionary stays at input output. For example, a self-driving car's AI is constrained by traffic laws, generating driving actions.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="19">
+                <div class="slide-content">
+                    <h3 class="segment-title">Ultra-Compact: Technical Image</h3>
+                    <ul>
+                        <li><strong>Technical image fakes objectivity.</strong> <code>&lt;Concepts/Text&gt;</code> [encodes] → <code>&lt;Technical-Image&gt;</code> [appears-as-objective]; critical viewing = [must-be-decoded].</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Interpreting an X-ray</h4>
+                        <p class="example-text">A doctor viewing an X-ray (<code>&lt;Technical-Image&gt;</code>) must [must-be-decoded] it using medical knowledge (<code>&lt;Concepts/Text&gt;</code>), rather than just seeing a shadow.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="X-ray Image" class="slide-image hidden">
+                            <span class="icon-placeholder">💀</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Technical image fakes objectivity. Concepts and Text encodes the Technical Image, which appears as objective. Critical viewing means it must be decoded. A doctor interpreting an X-ray must decode it using medical knowledge, not just see a shadow.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="20">
+                <div class="slide-content">
+                    <h3 class="segment-title">Ultra-Compact: Freedom</h3>
+                    <ul>
+                        <li><strong>Freedom = play against the program.</strong> <code>&lt;Photographer&gt;</code> [plays-against] <code>&lt;Camera-Program&gt;</code> via <code>&lt;Quantum-Doubt&gt;</code> → <code>&lt;Informative-Image&gt;</code> (low redundancy).</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Glitch Art Photography</h4>
+                        <p class="example-text">An artist deliberately using glitch art [plays-against] the camera's <code>&lt;Program&gt;</code> to produce an <code>&lt;Informative-Image&gt;</code> that critiques digital perfection.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Glitch Art" class="slide-image hidden">
+                            <span class="icon-placeholder">👾</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Freedom equals play against the program. The Photographer plays against the Camera Program via Quantum Doubt, leading to an Informative Image with low redundancy. An artist using glitch art plays against the camera's program to produce an informative image that critiques digital perfection.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="21">
+                <div class="slide-content">
+                    <h3 class="segment-title">Ultra-Compact: Distribution</h3>
+                    <ul>
+                        <li><strong>Meaning is routed, not found.</strong> <code>&lt;Distribution-Channel&gt;</code> [re-signifies] <code>&lt;Photograph&gt;</code> → <code>&lt;Encoded-Significance&gt;</code>; channels [program] <code>&lt;Audience&gt;</code>.</li>
+                    </ul>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: Viral Political Meme</h4>
+                        <p class="example-text">A political meme (<code>&lt;Photograph&gt;</code>) shared on social media (<code>&lt;Distribution-Channel&gt;</code>) [re-signifies] political opinions and [programs] <code>&lt;Audience&gt;</code> reactions.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Viral Meme" class="slide-image hidden">
+                            <span class="icon-placeholder">😂</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">Meaning is routed, not found. The Distribution Channel re-signifies a Photograph into Encoded Significance. Channels program the Audience. A viral political meme shared on social media re-signifies political opinions and programs audience reactions.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="22">
+                <div class="slide-content">
+                    <h3 class="segment-title">One-page Master Sitemap</h3>
+                    <div class="sitemap">
+<pre>
+&lt;Flusser-Model&gt;
+├── &lt;Apparatus&gt;
+│   ├── &lt;Program&gt; ← [constrains] &lt;Metaprogram&gt;
+│   ├── &lt;Black-Box&gt; [hides] &lt;Internal-State&gt;
+│   └── &lt;Functionary&gt; [operates] → I/O
+├── &lt;Technical-Image&gt;
+│   ├── &lt;Concepts/Text&gt; [encodes] → &lt;Image-Program&gt; [renders-as] → &lt;Surface&gt;
+│   └── &lt;Viewer&gt; { [appears-as-objective] | [must-be-decoded] }
+├── &lt;Freedom&gt;
+│   ├── &lt;Photographer&gt; [plays-against] &lt;Camera-Program&gt; [via] &lt;Quantum-Doubt&gt;
+│   └── &lt;Play&gt; { [produces] &lt;Informative-Image&gt; , [escalates-to] &lt;Metaprogram-Design&gt; }
+└── &lt;Distribution-Field&gt;
+    ├── &lt;Photograph&gt; → &lt;Channel₁…ₙ&gt; [re-signifies] → &lt;Encoded-Significance₁…ₙ&gt;
+    └── &lt;Audience&gt; ⇐ [programs] &lt;Channel&gt;
+</pre>
+                    </div>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: The Internet's Structure</h4>
+                        <p class="example-text">The internet itself can be viewed through this sitemap: content (<code>&lt;Photograph&gt;</code>) is distributed through platforms (<code>&lt;Channel&gt;</code>) to users (<code>&lt;Audience&gt;</code>), all operating within vast, hidden algorithms (<code>&lt;Apparatus&gt;</code> and <code>&lt;Program&gt;</code>).</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="Internet Network" class="slide-image hidden">
+                            <span class="icon-placeholder">🕸️</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">This master sitemap integrates Flusser's core platforms: Apparatus, Technical Image, Freedom, and Distribution Field, showing their interconnected entities and morphisms. The internet's structure, for instance, reflects this sitemap, with content distributed through platforms to users, all governed by hidden algorithms.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-slide-index="23">
+                <div class="slide-content">
+                    <h3 class="segment-title">Reuse Note</h3>
+                    <p class="one-line-summary">These modeling blocks are portable: swap <code>&lt;Camera&gt;</code> for any <code>&lt;Apparatus&gt;</code> (e.g., recommender system, LLM, trading bot) and keep the same <code>[constrains] / [plays-against] / [re-signifies]</code> skeleton to model power, freedom, and meaning in other domains.</p>
+                    <div class="example-section">
+                        <h4 class="example-title">Example: AI Chatbot "Jailbreaking"</h4>
+                        <p class="example-text">Applying Flusser's <code>[plays-against]</code> morphism to analyze how users [jailbreak] an <code>&lt;LLM&gt;</code> (<code>&lt;Apparatus&gt;</code>) to generate forbidden content, exemplifying human freedom against a program.</p>
+                        <div class="image-placeholder">
+                            <img src="" alt="AI Chatbot Icon" class="slide-image hidden">
+                            <span class="icon-placeholder">🤖</span>
+                        </div>
+                        <div class="image-input-group">
+                            <input type="url" class="image-url-input" placeholder="Paste image URL here">
+                            <button class="load-image-btn">Load</button>
+                            <button class="clear-image-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="voiceover-text hidden">These modeling blocks are portable: swap Camera for any Apparatus, such as a recommender system, LLM, or trading bot, and keep the same 'constrains', 'plays against', 're-signifies' skeleton to model power, freedom, and meaning in other domains. For instance, analyzing how users jailbreak an LLM to generate forbidden content can be understood through Flusser's framework of playing against the program.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="controls">
+            <button id="prevSlideBtn">Previous Slide</button>
+            <button id="playVoiceoverBtn">Play Voiceover</button>
+            <button id="nextSlideBtn">Next Slide</button>
+        </div>
+        <p class="slide-indicator">Slide <span id="currentSlide">1</span> of <span id="totalSlides">1</span></p>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlideIndex = 0;
+        let speechSynth = window.speechSynthesis;
+        let utterance = new SpeechSynthesisUtterance();
+
+        function showSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+
+            // Stop any ongoing speech
+            if (speechSynth.speaking) {
+                speechSynth.cancel();
+            }
+
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.style.opacity = 0;
+                slide.style.display = 'none'; // Ensure it's hidden to reset layout
+            });
+
+            currentSlideIndex = index;
+
+            // Show current slide
+            const activeSlide = slides[currentSlideIndex];
+            activeSlide.style.display = 'flex'; // Use flex to center content
+            activeSlide.offsetHeight; // Trigger reflow for transition
+            activeSlide.style.opacity = 1;
+            activeSlide.scrollTop = 0; // Reset scroll for new slide
+
+            updateControls();
+            updateSlideIndicator();
+        }
+
+        function updateControls() {
+            document.getElementById('prevSlideBtn').disabled = currentSlideIndex === 0;
+            document.getElementById('nextSlideBtn').disabled = currentSlideIndex === slides.length - 1;
+        }
+
+        function updateSlideIndicator() {
+            document.getElementById('currentSlide').textContent = currentSlideIndex + 1;
+            document.getElementById('totalSlides').textContent = slides.length;
+        }
+
+        function playVoiceover() {
+            if (speechSynth.speaking) {
+                speechSynth.cancel(); // Stop current speech if any
+            }
+
+            const voiceoverTextElement = slides[currentSlideIndex].querySelector('.voiceover-text');
+            if (voiceoverTextElement && voiceoverTextElement.textContent.trim() !== '') {
+                utterance.text = voiceoverTextElement.textContent;
+                utterance.lang = 'en-US';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                speechSynth.speak(utterance);
+            }
+        }
+
+        // Image loading logic
+        slides.forEach(slide => {
+            const loadImageBtn = slide.querySelector('.load-image-btn');
+            const clearImageBtn = slide.querySelector('.clear-image-btn');
+            const imageUrlInput = slide.querySelector('.image-url-input');
+            const slideImage = slide.querySelector('.slide-image');
+            const iconPlaceholder = slide.querySelector('.icon-placeholder');
+            const imagePlaceholder = slide.querySelector('.image-placeholder');
+
+            if (loadImageBtn) {
+                loadImageBtn.addEventListener('click', () => {
+                    const url = imageUrlInput.value.trim();
+                    if (url) {
+                        slideImage.src = url;
+                        slideImage.classList.remove('hidden');
+                        if (iconPlaceholder) iconPlaceholder.classList.add('hidden');
+                    } else {
+                        // If input is empty, revert to icon
+                        if (slideImage) slideImage.classList.add('hidden');
+                        if (iconPlaceholder) iconPlaceholder.classList.remove('hidden');
+                    }
+                });
+            }
+
+            if (clearImageBtn) {
+                clearImageBtn.addEventListener('click', () => {
+                    imageUrlInput.value = '';
+                    if (slideImage) slideImage.classList.add('hidden');
+                    if (iconPlaceholder) iconPlaceholder.classList.remove('hidden');
+                });
+            }
+
+            // Also handle image errors to revert to icon
+            if (slideImage) {
+                slideImage.addEventListener('error', () => {
+                    slideImage.classList.add('hidden');
+                    if (iconPlaceholder) iconPlaceholder.classList.remove('hidden');
+                    console.error("Failed to load image from URL:", slideImage.src);
+                });
+            }
+        });
+
+
+        document.getElementById('nextSlideBtn').addEventListener('click', () => {
+            showSlide(currentSlideIndex + 1);
+        });
+
+        document.getElementById('prevSlideBtn').addEventListener('click', () => {
+            showSlide(currentSlideIndex - 1);
+        });
+
+        document.getElementById('playVoiceoverBtn').addEventListener('click', playVoiceover);
+
+        // Initialize presentation
+        showSlide(0);
+
+        // Optional: Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                showSlide(currentSlideIndex + 1);
+            } else if (e.key === 'ArrowLeft') {
+                showSlide(currentSlideIndex - 1);
+            } else if (e.key === ' ') { // Spacebar for voiceover
+                e.preventDefault(); // Prevent page scroll
+                playVoiceover();
+            }
+        });
+    </script>
+</body>
+</html>

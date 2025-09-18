@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Spencer‑Brown Inspired Formal Models — Jurgenson × Flusser</title>
+<meta name="description" content="Single‑file, mobile‑first presentation of Spencer‑Brown inspired formal models for Jurgenson and Flusser." />
+<style>
+  :root{
+    /* Color system (dark Saul‑Bass‑ish) */
+    --bg:#0b0b0c;          /* canvas */
+    --fg:#f6f3ee;          /* text */
+    --muted:#b9b3a9;
+    --accent:#e62b1e;      /* punch */
+    --gold:#ffd166;        /* highlight */
+    --card:rgba(255,255,255,.06);
+
+    /* Type & rhythm */
+    --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --lh: 1.35;
+
+    /* Layout */
+    --radius:16px;
+    --pad: clamp(16px, 4vw, 32px);
+    --slide-w: min(1100px, 92vw);
+    --slide-h: min(720px, 84vh);
+  }
+
+  html,body{height:100%;}
+  html{background:var(--bg); color:var(--fg);} 
+  body{margin:0; font-family:var(--sans); line-height:var(--lh); -webkit-font-smoothing:antialiased;}
+  *{box-sizing:border-box}
+
+  /* App shell */
+  .app{min-height:100%; display:grid; grid-template-rows:auto 1fr auto;}
+  header, footer{position:sticky; z-index:10;}
+  header{top:0; background:linear-gradient(180deg, rgba(0,0,0,.6), rgba(0,0,0,0));}
+  footer{bottom:0; background:linear-gradient(0deg, rgba(0,0,0,.6), rgba(0,0,0,0));}
+  .bar{display:flex; align-items:center; gap:12px; padding: env(safe-area-inset-top) var(--pad) 8px;}
+  .brand{font-weight:700; letter-spacing:.3px;}
+  .brand .dot{color:var(--accent)}
+  .hint{margin-left:auto; font-size:.85rem; color:var(--muted)}
+
+  .stage{display:grid; place-items:center; padding: 16px var(--pad) env(safe-area-inset-bottom);} 
+  .slide{width:var(--slide-w); height:var(--slide-h); border-radius:var(--radius); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.10); box-shadow:0 12px 50px rgba(0,0,0,.45); padding: clamp(20px, 4vw, 36px); display:grid; grid-template-rows:auto 1fr auto; gap:14px; overflow:hidden;}
+
+  /* Slide header */
+  .slide h1, .slide h2, .slide h3{margin:0 0 .4em 0}
+  .kicker{color:var(--muted); font-weight:600; font-size:.9rem; letter-spacing:.08em; text-transform:uppercase}
+  .title{font-size: clamp(1.2rem, 3.8vw, 2.2rem); font-weight:800;}
+  .subtitle{color:var(--muted)}
+
+  /* Slide content */
+  .content{overflow:auto; padding-right: 4px;} /* slight room for scrollbar */
+  .content p{margin:.35em 0 0 0}
+  .content ul{margin:.3em 0 .6em 1.1em}
+  .content li{margin:.25em 0}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .card{background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px 14px}
+
+  code, .code{font-family:var(--mono); background:rgba(255,255,255,.06); padding:.08em .35em; border-radius:6px}
+  pre{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:12px; overflow:auto; font-family:var(--mono); font-size:.95rem}
+
+  /* Progress + controls */
+  .controls{display:flex; align-items:center; justify-content:space-between; gap:12px}
+  .btns{display:flex; gap:8px}
+  button{appearance:none; border:none; background:var(--card); color:var(--fg); border:1px solid rgba(255,255,255,.12); padding:10px 14px; border-radius:12px; font-weight:600; cursor:pointer}
+  button:hover{border-color:rgba(255,255,255,.28)}
+  .progress{flex:1; height:8px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden}
+  .barfill{height:100%; width:0%; background:linear-gradient(90deg, var(--accent), var(--gold));}
+
+  /* Overview grid */
+  .overview{display:none; gap:14px; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); padding:var(--pad)}
+  .overview .thumb{border-radius:12px; border:1px solid rgba(255,255,255,.12); background:var(--card); padding:12px; cursor:pointer}
+  .overview .thumb h4{margin:6px 0; font-size:1rem}
+  .overview .thumb .k{color:var(--muted); font-size:.8rem}
+
+  /* Badges / tokens */
+  .token{display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); padding:6px 10px; border-radius:999px; font-size:.9rem}
+  .token .dot{width:8px; height:8px; border-radius:50%; background:var(--accent)}
+
+  /* Responsive tweaks */
+  @media (max-width: 720px){
+    .grid-2{grid-template-columns:1fr}
+    .slide{height: min(78vh, 680px)}
+  }
+
+  /* Print (one slide per page) */
+  @media print{
+    body{background:#fff; color:#000}
+    .app, header, footer, .controls, .overview {display:none !important}
+    .slide{all:unset; display:block; width:100%; break-after:page; border:none; border-radius:0; box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="Spencer‑Brown presentation player">
+  <header>
+    <div class="bar" aria-live="polite">
+      <div class="brand">Post‑Binary Media Theory<span class="dot">●</span></div>
+      <div class="hint">Swipe ◀▶, Arrow keys, or use buttons • O to toggle overview</div>
+    </div>
+  </header>
+
+  <main class="stage">
+    <!-- Active slide container (populated by JS from #slides-template) -->
+    <section class="slide" id="active-slide" aria-roledescription="slide" aria-label="Slide">
+      <div class="kicker">Loading…</div>
+      <h1 class="title">Please wait</h1>
+      <div class="subtitle">Initializing deck</div>
+      <div class="content"></div>
+      <div class="controls">
+        <div class="btns">
+          <button id="prev" aria-label="Previous slide">◀ Prev</button>
+          <button id="next" aria-label="Next slide">Next ▶</button>
+          <button id="overviewBtn" aria-pressed="false" aria-label="Toggle overview">Overview</button>
+        </div>
+        <div class="progress" aria-label="Progress"><div class="barfill" id="barfill"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <section class="overview" id="overview" aria-label="Slide overview"></section>
+
+  <footer>
+    <div class="bar" style="padding-top:8px; padding-bottom: env(safe-area-inset-bottom);">
+      <span class="token"><span class="dot"></span>Single‑file • Mobile‑first • Offline</span>
+      <span class="hint" id="posHint">Slide 1/1</span>
+    </div>
+  </footer>
+</div>
+
+<!-- Slide data template: author your deck here. No external libs. -->
+<script>
+const DECK = [
+  {
+    kicker: "Spencer‑Brown × Media Theory",
+    title: "Formal Models of Jurgenson & Flusser",
+    subtitle: "Post‑Binary Media Theory, mobile‑first deck",
+    html: `
+      <div class="grid-2">
+        <div class="card">
+          <h3>What this deck does</h3>
+          <ul>
+            <li>Maps arguments into <span class="code">distinctions</span> and <span class="code">morphisms</span>.</li>
+            <li>Shows convergence: anti‑dualist, dialectical, constrained agency.</li>
+            <li>Offers an OLOG loop for socio‑technical co‑determination.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>How to use it</h3>
+          <ul>
+            <li>Swipe/arrow to advance; press <span class="code">O</span> for overview.</li>
+            <li>Print for handouts (1 slide per page).</li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  {
+    kicker: "JURGENSON — Primary Distinctions",
+    title: "Anti‑Dualist Framework",
+    subtitle: "Core Spencer‑Brown style distinctions",
+    html: `
+      <div class="grid-2">
+        <div class="card"><h3>Primary Distinction Structure</h3>
+          <ul>
+            <li><strong>◻₁ Digital Dualism</strong> — false split of online/offline.</li>
+            <li><strong>◻₂ Augmented Reality</strong> — unmarked, integrated lived reality.</li>
+            <li><strong>◻₃ Online/Offline Binary</strong> — sub‑distinction producing separation.</li>
+            <li><strong>◻₄ IRL Fetish</strong> — valorization of the disconnected.</li>
+            <li><strong>◻₅ Social Photo</strong> — photo as <em>communication</em> not mere document.</li>
+          </ul>
+        </div>
+        <div class="card"><h3>Morphological Operations</h3>
+          <ul>
+            <li><strong>→₁ Dualistic Critique</strong>: <span class="code">◻₁ ⊢ ¬◻₁ → ◻₂</span></li>
+            <li><strong>→₂ Logical Transformation</strong>: <span class="code">(A ∨ ¬A) → (A ∧ ¬A)</span></li>
+            <li><strong>→₃ Therapeutic Dissolution</strong>: <span class="code">◻₄ → ¬◻₄ → ◻₂</span></li>
+            <li><strong>→₄ Media Transformation</strong>: documentary → social communication</li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  {
+    kicker: "FLUSSER — Primary Distinctions",
+    title: "Apparatus Theory",
+    subtitle: "Program, gesture, and post‑history",
+    html: `
+      <div class="grid-2">
+        <div class="card"><h3>Primary Distinction Structure</h3>
+          <ul>
+            <li><strong>■₁ Apparatus</strong> — technical system with embedded programs.</li>
+            <li><strong>■₂ Human Gesture</strong> — creative insertion of unprogrammed info.</li>
+            <li><strong>■₃ Program</strong> — pre‑inscribed possibilities (as‑if freedom).</li>
+            <li><strong>■₄ Freedom</strong> — skilled outwitting of constraints.</li>
+            <li><strong>■₅ Technical Image</strong> — image of concepts (third order).</li>
+            <li><strong>■₆ Post‑History</strong> — cybernetic feedback replaces linear cause.</li>
+          </ul>
+        </div>
+        <div class="card"><h3>Morphological Operations</h3>
+          <ul>
+            <li><strong>⟶₁ Gestural Intervention</strong>: <span class="code">■₁ ⊢ ■₂ → (■₁ ∧ ■₂)</span></li>
+            <li><strong>⟶₂ Program Resistance</strong>: <span class="code">■₃ → ¬■₃ → ■₄</span></li>
+            <li><strong>⟶₃ Historical Progression</strong>: <span class="code">Magic → History → PostHistory</span></li>
+            <li><strong>⟶₄ Feedback Loop</strong>: <span class="code">■₁ ⟷ ■₂ → ■₁ ∪ ■₂</span></li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  {
+    kicker: "OLOG — Categorical Structure",
+    title: "Objects & Morphisms (E, T, H, S)",
+    subtitle: "Circular co‑determination",
+    html: `
+      <div class="grid-2">
+        <div class="card"><h3>Objects</h3>
+          <ul>
+            <li><strong>E</strong> — Experience (hybrid formation)</li>
+            <li><strong>T</strong> — Technology (apparatus)</li>
+            <li><strong>H</strong> — Human Agency (gesture)</li>
+            <li><strong>S</strong> — Social Practice (cultural activity)</li>
+          </ul>
+        </div>
+        <div class="card"><h3>Morphisms</h3>
+          <ul>
+            <li><span class="code">mediated_by: E → T</span></li>
+            <li><span class="code">enables: T → H</span></li>
+            <li><span class="code">creates: H → S</span></li>
+            <li><span class="code">shapes: S → E</span></li>
+          </ul>
+          <p><strong>Commutative Loop:</strong> <span class="code">E → T → H → S → E</span></p>
+        </div>
+      </div>
+    `
+  },
+  {
+    kicker: "Convergence",
+    title: "Shared Logical Structures",
+    subtitle: "Anti‑binary, dialectical, constrained‑agency",
+    html: `
+      <div class="grid-2">
+        <div class="card"><h3>Anti‑Binary Critiques</h3>
+          <ul>
+            <li><strong>Jurgenson</strong>: <span class="code">¬(Online ∨ Offline) → AugmentedReality</span></li>
+            <li><strong>Flusser</strong>: <span class="code">¬(Human ∨ Machine) → ApparatusComplex</span></li>
+          </ul>
+        </div>
+        <div class="card"><h3>Dialectical Resolutions</h3>
+          <ul>
+            <li><strong>Jurgenson</strong>: <span class="code">Digital ∧ Physical = IntegratedExperience</span></li>
+            <li><strong>Flusser</strong>: <span class="code">Apparatus ∧ Gesture = TechnicalCreativity</span></li>
+          </ul>
+          <h3 style="margin-top:.8em">Constrained Agency</h3>
+          <p><strong>Shared Theorem</strong>: <span class="code">∀x ∈ TechnicalPractice: Programmed(x) ∧ Creative(x)</span></p>
+        </div>
+      </div>
+    `
+  },
+  {
+    kicker: "Meta‑Theoretical Implications",
+    title: "Toward Post‑Binary Media Theory",
+    subtitle: "Hybrid experience & entanglement",
+    html: `
+      <div class="card">
+        <ol>
+          <li><strong>Identify false binaries</strong> that appear natural but are constructed.</li>
+          <li><strong>Critically dissolve</strong> them through analysis.</li>
+          <li><strong>Propose synthetic categories</strong> capturing socio‑technical complexity.</li>
+          <li><strong>Preserve human agency</strong> within systemic constraints.</li>
+        </ol>
+        <p class="subtitle">Fundamental insight: all experience in technological societies is <strong>hybrid</strong> — constituted via ongoing human‑technology entanglement.</p>
+      </div>
+    `
+  },
+  {
+    kicker: "Appendix (Optional)",
+    title: "Notation Quick‑Ref",
+    subtitle: "Spencer‑Brown flavor",
+    html: `
+      <div class="grid-2">
+        <div class="card"><h3>Marks & Moves</h3>
+          <ul>
+            <li><span class="code">◻</span> / <span class="code">■</span>: named primary distinctions</li>
+            <li><span class="code">¬</span>: re‑entry / crossing</li>
+            <li><span class="code">∧, ∨</span>: inclusive logic emphasis</li>
+            <li><span class="code">→</span>: morphism / transformation</li>
+          </ul>
+        </div>
+        <div class="card"><h3>Reading Tips</h3>
+          <ul>
+            <li>Prefer inclusivity over exclusivity: <span class="code">A ∧ ¬A</span> as lived mixture.</li>
+            <li>Track unmarked state (<em>integrated</em>) vs marked splits.</li>
+            <li>Watch feedback closures forming practice → experience loops.</li>
+          </ul>
+        </div>
+      </div>
+    `
+  }
+];
+
+/* ---- Presentation Engine (no frameworks) ---- */
+const $ = sel => document.querySelector(sel);
+const active = {
+  idx: 0,
+  mount(){ this.render(); this.bind(); this.syncHash(); this.renderOverview(); },
+  total(){ return DECK.length },
+  data(){ return DECK[this.idx] },
+  go(i){
+    const n = this.total();
+    this.idx = ( (i % n) + n ) % n; // safe wrap
+    this.render();
+    this.syncHash();
+  },
+  next(){ this.go(this.idx+1) },
+  prev(){ this.go(this.idx-1) },
+  bind(){
+    $('#prev').addEventListener('click', ()=>this.prev());
+    $('#next').addEventListener('click', ()=>this.next());
+    $('#overviewBtn').addEventListener('click', toggleOverview);
+
+    // Keys: arrows, home/end, O for overview
+    window.addEventListener('keydown', (e)=>{
+      if(document.activeElement && ['INPUT','TEXTAREA','BUTTON'].includes(document.activeElement.tagName)) return;
+      if(e.key==='ArrowRight' || e.key==='PageDown') this.next();
+      else if(e.key==='ArrowLeft' || e.key==='PageUp') this.prev();
+      else if(e.key==='Home') this.go(0);
+      else if(e.key==='End') this.go(this.total()-1);
+      else if(e.key.toLowerCase()==='o') toggleOverview();
+    });
+
+    // Touch swipe
+    let sx=0, sy=0;
+    window.addEventListener('touchstart', (e)=>{ if(e.touches[0]){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; } }, {passive:true});
+    window.addEventListener('touchend', (e)=>{
+      const t = e.changedTouches[0]; if(!t) return;
+      const dx = t.clientX - sx; const dy = t.clientY - sy;
+      if(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)){
+        dx<0 ? this.next() : this.prev();
+      }
+    }, {passive:true});
+
+    // Hash routing
+    window.addEventListener('hashchange', ()=>{
+      const i = parseInt(location.hash.replace('#',''),10);
+      if(!Number.isNaN(i)) this.go(i);
+    });
+  },
+  syncHash(){ history.replaceState(null, '', '#' + this.idx); },
+  render(){
+    const slide = this.data();
+    $('#active-slide .kicker').textContent = slide.kicker || '';
+    $('#active-slide .title').textContent = slide.title || '';
+    $('#active-slide .subtitle').textContent = slide.subtitle || '';
+    $('#active-slide .content').innerHTML = slide.html || '';
+    const pct = ((this.idx+1)/this.total())*100; $('#barfill').style.width = pct+'%';
+    $('#posHint').textContent = `Slide ${this.idx+1}/${this.total()}`;
+    $('#active-slide').setAttribute('aria-label', `Slide ${this.idx+1}: ${slide.title}`);
+  }
+};
+
+function renderOverview(){
+  const ov = $('#overview'); ov.innerHTML = '';
+  DECK.forEach((s, i)=>{
+    const d = document.createElement('div'); d.className = 'thumb'; d.tabIndex=0;
+    d.innerHTML = `<div class="k">${s.kicker||''}</div><h4>${s.title||'Untitled'}</h4><div class="subtitle">${s.subtitle||''}</div>`;
+    d.addEventListener('click', ()=>{ active.go(i); toggleOverview(false); });
+    d.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ active.go(i); toggleOverview(false);} });
+    ov.appendChild(d);
+  });
+}
+
+function toggleOverview(force){
+  const ov = $('#overview');
+  const btn = $('#overviewBtn');
+  const on = force===undefined ? ov.style.display!=="grid" : !!force;
+  ov.style.display = on? 'grid' : 'none';
+  btn.setAttribute('aria-pressed', on? 'true':'false');
+  if(on){ window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'}); }
+}
+
+// Boot
+active.mount();
+renderOverview();
+</script>
+</body>
+</html>

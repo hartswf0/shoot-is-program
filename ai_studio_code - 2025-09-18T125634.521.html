@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flusser's Philosophy of Photography - Presentation</title>
+    <style>
+        /* General Resets & Variables */
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2a2a2a;
+            --text-color: #e0e0e0;
+            --accent-color: #6a9cff;
+            --font-family-primary: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-family-secondary: 'Georgia', serif;
+            --font-size-base: 1.8vw; /* Responsive base font size */
+            --padding-base: 2vh;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            color: var(--text-color);
+            background-color: var(--primary-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Hide scrollbars, manage content with JS */
+            font-size: var(--font-size-base);
+            line-height: 1.4;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content space-between;
+            align-items: center;
+            padding: var(--padding-base);
+            position: relative;
+            background-color: var(--secondary-bg);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .slide-wrapper {
+            width: 100%;
+            height: calc(100% - 12vh); /* Adjust for controls */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            flex-grow: 1; /* Allow wrapper to take available space */
+        }
+
+        .slide {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background-color: var(--primary-bg);
+            border-radius: 10px;
+            padding: calc(var(--padding-base) * 2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none; /* Hidden by default, shown by JS */
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            text-align: left;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            overflow-y: auto; /* Allow scrolling for long slides */
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .episode-title {
+            font-size: calc(var(--font-size-base) * 1.5);
+            color: var(--accent-color);
+            margin-bottom: var(--padding-base);
+            text-align: center;
+            width: 100%;
+        }
+
+        .slide-type {
+            font-size: calc(var(--font-size-base) * 0.9);
+            color: #b0b0b0;
+            margin-bottom: var(--padding-base);
+            width: 100%;
+            text-align: center;
+        }
+
+        .scene-text {
+            font-family: var(--font-family-secondary);
+            font-style: italic;
+            font-size: calc(var(--font-size-base) * 1.1);
+            margin-bottom: var(--padding-base);
+            color: #c0c0c0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .segment-title {
+            font-size: calc(var(--font-size-base) * 1.2);
+            color: var(--accent-color);
+            margin-top: var(--padding-base);
+            margin-bottom: calc(var(--padding-base) * 0.5);
+        }
+
+        .key-concept strong,
+        .argument strong,
+        .historic-precedent strong,
+        .critique strong,
+        .key-features strong {
+            color: var(--accent-color);
+        }
+
+        .quote {
+            font-family: var(--font-family-secondary);
+            font-style: italic;
+            margin: var(--padding-base) 0;
+            padding-left: var(--padding-base);
+            border-left: 3px solid var(--accent-color);
+            color: #b0b0b0;
+            font-size: calc(var(--font-size-base) * 0.95);
+        }
+
+        .sources {
+            margin-top: calc(var(--padding-base) * 1.5);
+            border-top: 1px solid #444;
+            padding-top: var(--padding-base);
+            width: 100%;
+        }
+
+        .sources h4 {
+            font-size: calc(var(--font-size-base) * 0.9);
+            color: var(--accent-color);
+            margin-bottom: calc(var(--padding-base) * 0.5);
+        }
+
+        .source-list {
+            list-style: none;
+            font-size: calc(var(--font-size-base) * 0.8);
+            color: #a0a0a0;
+        }
+
+        .source-list li {
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin-top: var(--padding-base);
+            gap: 1vh; /* Gap between buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            padding: 1vh 2vw; /* Responsive padding */
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: calc(var(--font-size-base) * 0.8);
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            flex-grow: 1; /* Allow buttons to grow */
+            min-width: 100px; /* Minimum width for buttons */
+        }
+
+        button:hover {
+            background-color: #8ab7ff;
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .slide-indicator {
+            color: var(--text-color);
+            font-size: calc(var(--font-size-base) * 0.9);
+            text-align: center;
+            width: 100%;
+            margin-top: calc(var(--padding-base) * 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Media Queries for smaller screens */
+        @media (max-width: 768px) {
+            body {
+                font-size: 3vw; /* Larger base font size for mobile */
+            }
+
+            .slide {
+                width: 95%;
+                height: 95%;
+                padding: var(--padding-base);
+            }
+
+            .episode-title {
+                font-size: calc(3vw * 1.5);
+            }
+
+            .segment-title {
+                font-size: calc(3vw * 1.2);
+            }
+
+            .scene-text, .quote {
+                font-size: calc(3vw * 1.1);
+            }
+
+            .key-concept, .argument, .historic-precedent, .critique, .key-features, .source-list {
+                font-size: calc(3vw * 0.9);
+            }
+
+            .sources h4 {
+                font-size: calc(3vw * 0.9);
+            }
+
+            .controls {
+                flex-direction: row;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                width: 95%;
+                margin-top: 1vh;
+            }
+
+            button {
+                padding: 1.5vh 3vw;
+                font-size: calc(3vw * 0.85);
+                flex-basis: 48%; /* Two buttons per row */
+            }
+
+            .slide-indicator {
+                font-size: calc(3vw * 0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+        <div class="slide-wrapper">
+            <!-- Episode 1 -->
+            <div class="slide" data-episode="1" data-slide-index="0">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 5 — *Encoding the Jungle: Bias, Code, and Intra-action*</h2>
+                    <p class="slide-type">Opening Scene</p>
+                    <div class="opening-scene-content">
+                        <p class="scene-text">*A spider spins its web in golden morning light. Each strand shimmers, catching not only insects but dust, pollen, and stray seeds.*</p>
+                    </div>
+                    <div class="closing-reflection">
+                        <p class="scene-text">**Voice-over (Attenborough tone):** “In every communication, there is more than message. There is noise, there is power, there is bias. Stuart Hall taught us this: encoding is never neutral, and decoding is never guaranteed. In the ecology of AI, we must look closely at the web—at what sticks, and what falls through.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">In every communication, there is more than message. There is noise, there is power, there is bias. Stuart Hall taught us this: encoding is never neutral, and decoding is never guaranteed. In the ecology of AI, we must look closely at the web—at what sticks, and what falls through.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="1" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 5 — *Encoding the Jungle: Bias, Code, and Intra-action*</h2>
+                    <p class="slide-type">Segment 1</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 1: Hall’s Encoding/Decoding</h3>
+                        <p class="key-concept">**Key Concept:** Communication as a contested field of meaning, where encoding and decoding are never neutral processes.</p>
+                        <ul>
+                            <li>**Encoding** = how a message is structured within cultural codes.</li>
+                            <li>**Decoding** = how audiences interpret, sometimes oppositional, sometimes negotiated.</li>
+                            <li>Media is a **contested field** of meaning, never a transparent transmission.</li>
+                        </ul>
+                        <p class="argument">**Argument:** Hall showed that power is embedded in the act of encoding. Producers embed meanings, and audiences can resist, remix, or subvert them. This highlights media as a site of struggle over meaning, not simple transmission.</p>
+                        <p class="voiceover-text hidden">In the media ecosystems of the 20th century, Hall showed us that power hides in the act of encoding. Producers and broadcasters embed meanings. Audiences resist, remix, and subvert them.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Stuart Hall, “Encoding/Decoding” (1980).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="1" data-slide-index="2">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 5 — *Encoding the Jungle: Bias, Code, and Intra-action*</h2>
+                    <p class="slide-type">Segment 2</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 2: Neural Encoding</h3>
+                        <p class="key-concept">**Key Concept:** AI models reconfigure features into probabilistic clusters, with encoding being an intra-active, emergent process rather than a fixed transmission.</p>
+                        <ul>
+                            <li>Bajohr points to **sparse vs. dense encoding** in neural nets, mirroring debates in neuroscience.</li>
+                            <li>AI models do not *transmit* meanings but reconfigure features into probabilistic clusters.</li>
+                            <li>Encoding is *intra-active*: the model encodes *and* the user’s prompt re-encodes simultaneously.</li>
+                        </ul>
+                        <p class="argument">**Argument:** In AI, encoding is dynamic and statistical, woven anew from countless prior traces. It's a continuous, intra-active process where both the model and user contribute to meaning-making, rather than a one-way transmission.</p>
+                        <p class="voiceover-text hidden">In the AI forest, encoding is no longer fixed in stone. It is statistical, recursive, emergent—woven each time anew from countless prior traces.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Hannes Bajohr, *Thinking With AI* (2025) — sparse vs. dense encoding in neural nets and their implications for multimodal collapse.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="1" data-slide-index="3">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 5 — *Encoding the Jungle: Bias, Code, and Intra-action*</h2>
+                    <p class="slide-type">Segment 3</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 3: Bias as Ecology</h3>
+                        <p class="key-concept">**Key Concept:** Bias is an ecological choice, reproducing dominant codes in training data while allowing for negotiated and oppositional decodings through user practices.</p>
+                        <ul>
+                            <li>What counts as “signal” is itself an ecological choice: what is trained, what is filtered, what is censored.</li>
+                            <li>In Hall’s terms: **dominant-hegemonic codes** may be reproduced in training data.</li>
+                            <li>But **negotiated** and **oppositional** decodings appear in **user practices**—remixes, jailbreaks, critiques.</li>
+                        </ul>
+                        <p class="argument">**Argument:** The choices made in AI development (training data, filters) embed biases that reflect dominant cultural codes. However, users actively engage with and challenge these biases through various practices, leading to a dynamic and contested "ecology of bias."</p>
+                        <p class="voiceover-text hidden">In every web, what is caught is not the whole. The threads reflect choices—of what to value, what to ignore, what to exclude. This is bias as ecology.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Stuart Hall, “Encoding/Decoding” (1980).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="1" data-slide-index="4">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 5 — *Encoding the Jungle: Bias, Code, and Intra-action*</h2>
+                    <p class="slide-type">Segment 4</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 4: Apparatus of Bias</h3>
+                        <p class="key-concept">**Key Concept:** Bias is a structural effect of the apparatus itself, not an accident, with meaning emerging from statistical weightings rather than singular human intent.</p>
+                        <ul>
+                            <li>Barad reminds us: **apparatuses produce phenomena, not merely observe them.**</li>
+                            <li>Bias is not an accident but a **structural effect** of the apparatus itself.</li>
+                            <li>Meaning in AI emerges from statistical weightings, not from singular human intent.</li>
+                        </ul>
+                        <p class="argument">**Argument:** Drawing on Barad, the apparatus actively produces the phenomena it observes, making bias an intrinsic structural component. In AI, this means meaning is derived from statistical patterns, emphasizing that bias is deeply embedded in the system's design.</p>
+                        <p class="voiceover-text hidden">Bias is not a glitch in the weave. It is the pattern of the weave itself. To change the web is to change the conditions of capture, the very fabric of what can be seen.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Karen Barad, *Meeting the Universe Halfway* — apparatuses and intra-action.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="1" data-slide-index="5">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 5 — *Encoding the Jungle: Bias, Code, and Intra-action*</h2>
+                    <p class="slide-type">Closing Reflection</p>
+                    <div class="closing-reflection">
+                        <p class="scene-text">*The spider web fades into a neural net visualization. Each strand pulses with luminous code, alive with tension and possibility.*</p>
+                        <p class="scene-text">**Voice-over:** “The web is not neutral. Every strand catches more than it intends. To see bias in AI is not to find a flaw, but to recognize its ecology. Encoding is always already decoding. And in this jungle, every signal carries the weight of its world.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">The web is not neutral. Every strand catches more than it intends. To see bias in AI is not to find a flaw, but to recognize its ecology. Encoding is always already decoding. And in this jungle, every signal carries the weight of its world.</p>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Stuart Hall, “Encoding/Decoding” (1980).</li>
+                            <li>Karen Barad, *Meeting the Universe Halfway* — apparatuses and intra-action.</li>
+                            <li>Hannes Bajohr, *Thinking With AI* (2025) — sparse vs. dense encoding in neural nets and their implications for multimodal collapse.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episode 2 -->
+            <div class="slide" data-episode="2" data-slide-index="0">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 6 — *Caves of Light: Photography's Ontological Illusion*</h2>
+                    <p class="slide-type">Opening Scene</p>
+                    <div class="opening-scene-content">
+                        <p class="scene-text">*A pristine, ancient cave painting flickers under torchlight, depicting animals and hunters with primal immediacy. Beside it, a hyper-realistic digital photograph of the same scene is projected, momentarily deceiving the eye with its apparent presence.*</p>
+                    </div>
+                    <div class="closing-reflection">
+                        <p class="scene-text">**Voice-over (Attenborough tone):** “For centuries, art wrestled with capturing reality. Then, a new medium emerged, promising to free us from the burden of representation, by convincing us we had finally *captured* reality itself. But this liberation was, in fact, an even more profound illusion.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">For centuries, art wrestled with capturing reality. Then, a new medium emerged, promising to free us from the burden of representation, by convincing us we had finally captured reality itself. But this liberation was, in fact, an even more profound illusion.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="2" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 6 — *Caves of Light: Photography's Ontological Illusion*</h2>
+                    <p class="slide-type">Segment 1</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 1: Third-Order Abstraction & Conceptual Images</h3>
+                        <p class="key-concept">**Key Concept**: Technical images are not direct reflections of the world but "abstractions of the third order," signifying concepts and theories, not phenomena.</p>
+                        <p class="argument">**Flusser's View**: "Ontologically, traditional images signify phenomena whereas technical images signify concepts." Technical images "abstract from texts which abstract from traditional images which themselves abstract from the concrete world." This means a photograph of a tree isn't the tree itself, nor even a direct artistic interpretation, but rather an image of the *concept* of a tree, as filtered through the scientific principles and programs embedded in the camera.</p>
+                        <p class="voiceover-text hidden">The photograph, born of science and code, presents us not with the world, but with an encoded idea of the world. It is a concept masquerading as an experience.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="2" data-slide-index="2">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 6 — *Caves of Light: Photography's Ontological Illusion*</h2>
+                    <p class="slide-type">Segment 2</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 2: The Magic Spell and the Illusion of Presence</h3>
+                        <p class="key-concept">**Key Concept**: Technical images cast a "magic spell" by appearing objectively transparent, creating a powerful illusion of presence that makes them seem like unmediated "windows" onto reality.</p>
+                        <p class="argument">**Flusser's View**: Technical images appear "on the same level of reality as their significance." "What one sees on them therefore do not appear to be symbols that one has to decode but symptoms of the world." This leads observers to see them "not as images but as windows."</p>
+                        <p class="argument">**Connection to Bazin's Ontology**: Bazin posited that photography offers a "re-creation of the world in its own image, an image as like as possible to the object it represents," aiming for an "ontology of the photographic image" that captures a pure impression of reality. Flusser argues that this "re-creation" is actually a conceptual encoding that *deceives* us into believing in unmediated presence, a "magic spell" that conceals its theoretical basis. [cite: Bazin]</p>
+                        <p class="argument">**Connection to Sontag's Framing**: Sontag, in her critique, highlights how photography frames reality, creating a "grammar" and "ethics" of seeing, making us believe in the "truth" of what is captured. Flusser elaborates on *how* this framing occurs, not just as an aesthetic choice but as a programmatic function of the apparatus and its embedded concepts. [cite: Sontag]</p>
+                        <p class="voiceover-text hidden">This is photography’s profound deception: it promises direct access, an unmediated gaze. It convinces us of the sheer presence of what it depicts, echoing Bazin's search for an objective reality, yet it is a carefully constructed stage, framed by invisible design, as Sontag well understood.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                            <li>André Bazin, "The Ontology of the Photographic Image" (1945).</li>
+                            <li>Susan Sontag, *On Photography* (1977).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="2" data-slide-index="3">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 6 — *Caves of Light: Photography's Ontological Illusion*</h2>
+                    <p class="slide-type">Segment 3</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 3: The "IRL Fetish" and the Betrayal of Reality</h3>
+                        <p class="key-concept">**Key Concept**: The illusion of captured reality, fostered by photography's "magic spell," paradoxically gives rise to an "IRL fetish" where the mediated image is mistaken for or preferred over unmediated experience.</p>
+                        <p class="argument">**Flusser's View**: "Photographs suppress our critical awareness in order to make us forget the mindless absurdity of the process of functionality." They "entice those receiving them to project this undecoded magic onto the world out there."</p>
+                        <p class="argument">**Connection to Jurgenson's "IRL Fetish"**: Flusser's concept of the photograph creating a "magic spell" that causes us to project undecoded meaning onto the world directly informs Jurgenson's "IRL fetish." This is the paradoxical desire for the "unmediated" that is *itself born from* and continually fed by the very act of mediation. The photograph, by "freeing us from reality" (i.e., from directly engaging with its complexity), ironically convinces us we've captured it, making the mediated image the new object of desire for "reality." [cite: Jurgenson]</p>
+                        <p class="voiceover-text hidden">We become addicted to the image, mistaking the map for the territory. This is the heart of the ‘IRL fetish’ – a yearning for authenticity that the photograph, through its powerful illusion of presence, both promises and fundamentally undermines, binding us ever tighter to the mediated.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                            <li>Nathan Jurgenson, "The IRL Fetish" (concept reference).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="2" data-slide-index="4">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 6 — *Caves of Light: Photography's Ontological Illusion*</h2>
+                    <p class="slide-type">Segment 4</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 4: Rewriting Reality – Images Over Texts</h3>
+                        <p class="key-concept">**Key Concept**: Photography "rewrites" reality by prioritizing images over texts, shifting from a linear-historical understanding to a magical-ritualistic mode of existence.</p>
+                        <p class="argument">**Flusser's View**: "Throughout history, texts have explained images; now photographs illustrate articles... This reversal of the text-photo relationship is typically post-industrial and renders any historical action impossible." Images become "magical models" programming our actions. The photograph does not just record history; it turns events into "states of things" that are endlessly repeatable. This means our understanding of events, like the "war in Lebanon," becomes a ritualistic response to the image rather than a critical engagement with historical causes and consequences.</p>
+                        <p class="voiceover-text hidden">The old order, where texts deciphered images, has been overthrown. Now, the image reigns supreme, recasting history into an endless loop of scenes, programming our reactions, and subtly rewriting the very fabric of what we understand to be real and present.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="2" data-slide-index="5">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 6 — *Caves of Light: Photography's Ontological Illusion*</h2>
+                    <p class="slide-type">Closing Reflection</p>
+                    <div class="closing-reflection">
+                        <p class="scene-text">*The cave painting glows, then a photograph of it, then a neural network representing its digital encoding. The layers of mediation become visible, yet the powerful illusion of a single, objective reality persists.*</p>
+                        <p class="scene-text">**Voice-over:** “Photography, the 'Caves of Light,' offers us not a window into reality, but a profound re-enchantment. By convincing us we’ve captured the world, it frees us from its raw, unmediated truth, paradoxically sealing us within a powerful illusion of presence, defining reality on its own conceptual terms.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">Photography, the 'Caves of Light,' offers us not a window into reality, but a profound re-enchantment. By convincing us we’ve captured the world, it frees us from its raw, unmediated truth, paradoxically sealing us within a powerful illusion of presence, defining reality on its own conceptual terms.</p>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                            <li>André Bazin, "The Ontology of the Photographic Image" (1945).</li>
+                            <li>Susan Sontag, *On Photography* (1977).</li>
+                            <li>Nathan Jurgenson, "The IRL Fetish" (concept reference).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episode 3 -->
+            <div class="slide" data-episode="3" data-slide-index="0">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 7 — *To Shoot Is to Program: The Quantum Hunt for Freedom*</h2>
+                    <p class="slide-type">Opening Scene</p>
+                    <div class="opening-scene-content">
+                        <p class="scene-text">*A hunter stalks through a dense, stylized digital forest, their movements precise, almost robotic. Each step is a calculation, each decision a micro-adjustment within a complex, unseen algorithm.*</p>
+                    </div>
+                    <div class="closing-reflection">
+                        <p class="scene-text">**Voice-over (Attenborough tone):** “In the photographic universe, every click is a command, every image an output. To wield a camera is not merely to observe, but to participate in a profound act of programming. Here, the pursuit of freedom becomes a subtle, quantum struggle against the very code that defines our seeing.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">In the photographic universe, every click is a command, every image an output. To wield a camera is not merely to observe, but to participate in a profound act of programming. Here, the pursuit of freedom becomes a subtle, quantum struggle against the very code that defines our seeing.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="3" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 7 — *To Shoot Is to Program: The Quantum Hunt for Freedom*</h2>
+                    <p class="slide-type">Segment 1</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 1: The Photographer as Functionary in a Programmed Act</h3>
+                        <p class="key-concept">**Key Concept**: To take a photograph is to follow a program; the photographer acts as a "functionary" whose intentions are ultimately subordinate to the camera's pre-set categories.</p>
+                        <p class="argument">**Flusser's View**: "The camera does the will of the photographer but the photographer has to will what the camera can do." The photographer selects "combinations of categories" from those programmed into the camera. Even before a "shot" is taken, the photographer operates within the camera's parameters (e.g., lens type, ISO, shutter speed settings). This means the act of "shooting" is inherently an act of *executing* a program.</p>
+                        <p class="voiceover-text hidden">The camera, an extension of our will, dictates the very language of vision. Its internal program, a silent script, choreographs our movements, shaping our gaze long before the shutter ever clicks.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="3" data-slide-index="2">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 7 — *To Shoot Is to Program: The Quantum Hunt for Freedom*</h2>
+                    <p class="slide-type">Segment 2</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 2: "Quantum Doubt" and the Challenge of Redundancy</h3>
+                        <p class="key-concept">**Key Concept**: True photographic practice involves "quantum doubt"—a series of atomized hesitations and decisions aimed at producing "informative, improbable images" that push beyond the camera's default, redundant outputs.</p>
+                        <p class="argument">**Flusser's View**: "The structure of the act of photography is a quantum one: a doubt made up of points of hesitation and points of decision-making." Photographers "are in pursuit of possibilities that are still unexplored in the camera's program, in pursuit of informative, improbable images that have not been seen before." This "quantum doubt" is the photographer's method to *play against the program*. Instead of letting the camera's inherent "filters" (preset options) *distort* perception by limiting it to the probable, the photographer actively seeks to reveal these limitations or create images *outside* them. A photograph taken with an intentional unconventional "filter" choice might be an act of "quantum doubt," distorting typical perception to reveal new information.</p>
+                        <p class="voiceover-text hidden">Yet, within this programmed hunt, a space for defiance emerges: ‘quantum doubt.’ A series of micro-decisions, hesitations, and deliberate choices, where the photographer battles the predictable, striving to unearth images unforeseen by the code itself. Here, the common 'filter' is not merely applied but questioned, its perceptual distortion a conscious act of inquiry.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="3" data-slide-index="3">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 7 — *To Shoot Is to Program: The Quantum Hunt for Freedom*</h2>
+                    <p class="slide-type">Segment 3</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 3: Freedom as Playing Against the Program</h3>
+                        <p class="key-concept">**Key Concept**: Freedom in photographic practice is not liberation *from* the apparatus, but the strategy of "playing against the camera" by smuggling human intentions into its program to create the unpredictable.</p>
+                        <p class="argument">**Flusser's View**: "Freedom is the strategy of making chance and necessity subordinate to human intention. Freedom is playing against the camera." This involves creating "something that is not in its program." This proactive engagement turns the photographic act into a philosophical quest for agency within a deterministic system. It's about consciously subverting the expected output of the program, making the apparatus yield something truly new and informative.</p>
+                        <p class="voiceover-text hidden">This is the photographer's true quest: not to escape the digital cage, but to dance within its bars. To play against the program, to inject human will into the automated flow, making the predictable yield to the profound surprise of the unforeseen.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="3" data-slide-index="4">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 7 — *To Shoot Is to Program: The Quantum Hunt for Freedom*</h2>
+                    <p class="slide-type">Segment 4</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 4: Surveillance and the Programmed Gaze</h3>
+                        <p class="key-concept">**Key Concept**: Surveillance operates as a photographic practice, a programmed act designed to categorize and control, highlighting how automated "shooting" distorts perception by limiting interpretation.</p>
+                        <p class="argument">**Flusser's View**: The apparatus allows for "mass culture of cameras adjusted to the norm; in the West, in Japan, in underdeveloped countries – all over the world, everything is photographed through the same categories." This creates "redundant photographs" that carry "no new information." Surveillance exemplifies how "to shoot is to program." Surveillance cameras are apparatuses programmed to continuously "shoot" (record) within highly specific, normalized categories, creating a deluge of redundant images that are analyzed by other programs. This practice inherently *distorts perception* by reducing complex human behavior to pre-defined categories and anomalies, often missing nuance or alternative interpretations, and limiting the "historical consciousness" of human observation.</p>
+                        <p class="voiceover-text hidden">Consider the ubiquitous eye of surveillance: a tireless functionary, programmed to capture, categorize, and control. Its ceaseless 'shooting' is a profound act of programming, distorting our perception of the public sphere, reducing dynamic life to predictable patterns, and leaving little room for quantum doubt or unforeseen meaning.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="3" data-slide-index="5">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 7 — *To Shoot Is to Program: The Quantum Hunt for Freedom*</h2>
+                    <p class="slide-type">Closing Reflection</p>
+                    <div class="closing-reflection">
+                        <p class="scene-text">*The digital forest vanishes, replaced by a single, pixelated image that, upon closer inspection, reveals a unique, improbable pattern not found in any standard code. It hums with a quiet, rebellious energy.*</p>
+                        <p class="scene-text">**Voice-over:** “In the grand theater of algorithms, to take a photograph is to follow a program. But to truly see, to truly create, is to know that program, and then, with quantum defiance, to play against it – to shoot not just with the camera, but with the full, unyielding force of human intention, thereby reshaping perception itself.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">In the grand theater of algorithms, to take a photograph is to follow a program. But to truly see, to truly create, is to know that program, and then, with quantum defiance, to play against it – to shoot not just with the camera, but with the full, unyielding force of human intention, thereby reshaping perception itself.</p>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episode 4 -->
+            <div class="slide" data-episode="4" data-slide-index="0">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 8 — *Seeing Like a Medium: Unpacking the Codes of Reality*</h2>
+                    <p class="slide-type">Opening Scene</p>
+                    <div class="opening-scene-content">
+                        <p class="scene-text">*A swirling nebula of information, a stream of images, sounds, and texts, coalesces into familiar forms: a news anchor, a celebrity, a product advertisement. Each form subtly vibrates with an invisible subtext.*</p>
+                    </div>
+                    <div class="closing-reflection">
+                        <p class="scene-text">**Voice-over (Attenborough tone):** “We navigate a world woven by media, where every image, every broadcast, every feed, claims to show us the truth. But this is no neutral window. Each medium is an active encoder, subtly and profoundly shaping what we see, hear, and ultimately, what we believe to be real.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">We navigate a world woven by media, where every image, every broadcast, every feed, claims to show us the truth. But this is no neutral window. Each medium is an active encoder, subtly and profoundly shaping what we see, hear, and ultimately, what we believe to be real.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="4" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 8 — *Seeing Like a Medium: Unpacking the Codes of Reality*</h2>
+                    <p class="slide-type">Segment 1</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 1: Distribution Channels as Encoders of Significance</h3>
+                        <p class="key-concept">**Key Concept**: Media distribution channels are not neutral conduits but active encoders that imbue images with specific, often shifting, significance.</p>
+                        <p class="argument">**Flusser's View**: "The distribution apparatuses impregnate the photograph with the decisive significance for its reception." A single photograph gains "new significance" with each "switch-over to another channel." This means a photograph's meaning is highly fluid and contextual. Its "truth" or "objectivity" is less about its inherent content and more about the social, political, or artistic channel through which it is disseminated, directly challenging the notion of a single, fixed reality.</p>
+                        <p class="voiceover-text hidden">A single photograph, seemingly inert, transforms with every channel it traverses. From scientific journal to political poster, from commercial ad to art gallery, its meaning mutates, proving that significance is not found, but assigned by the very medium that carries it.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="4" data-slide-index="2">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 8 — *Seeing Like a Medium: Unpacking the Codes of Reality*</h2>
+                    <p class="slide-type">Segment 2</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 2: The Struggle for Meaning: Photographer vs. Channel</h3>
+                        <p class="key-concept">**Key Concept**: A fundamental struggle exists between the photographer's intention and the distribution channel's program, revealing the embedded codes and biases within images and popular culture.</p>
+                        <p class="argument">**Flusser's View**: "Every distributed photograph allows photography criticism to reconstruct the struggle between photographer and channel." Photographers "attempt to fool the newspaper's censorship by surreptitiously smuggling aesthetic, political or epistemological elements into their image." This "dramatic confusion" allows us to "unpack the codes embedded in images." The apparent neutrality of popular culture or news feeds is constantly being negotiated. The photograph itself becomes a site where human intention clashes with programmatic control, and understanding this conflict is key to decoding media bias.</p>
+                        <p class="voiceover-text hidden">Behind every image lies a silent battle—the photographer striving to embed their truth, the channel seeking to impose its own narrative. To discern these embedded codes, we must listen for the echoes of this struggle, recognizing that every image in popular culture is a contested field of meaning.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="4" data-slide-index="3">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 8 — *Seeing Like a Medium: Unpacking the Codes of Reality*</h2>
+                    <p class="slide-type">Segment 3</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 3: The "Trahison des Clercs" in Media Criticism</h3>
+                        <p class="key-concept">**Key Concept**: Complacent media criticism, by ignoring the encoding power of channels, allows media biases to remain invisible, contributing to an uncritical reception of "shared reality."</p>
+                        <p class="argument">**Flusser's View**: "Standard photography criticism does not read off from photographs this dramatic confusion of the photographer's intention with the program of the channel... They ignore the fact that the channels determine the significance of the photographs." This amounts to a "trahison des clercs" (betrayal of intellectuals). When critics fail to scrutinize the channels' programmatic influence, they inadvertently support the channels' agenda to appear invisible and objective. This leaves audiences susceptible to manipulation, hindering the development of critical awareness needed to question culturally dominant narratives.</p>
+                        <p class="voiceover-text hidden">When critical voices fall silent, or merely echo the obvious, they unwittingly perpetuate the illusion. The true betrayal lies in neglecting the invisible hand of the channel, allowing its biases to sculpt our cultural consensus unexamined, unchecked.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="4" data-slide-index="4">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 8 — *Seeing Like a Medium: Unpacking the Codes of Reality*</h2>
+                    <p class="slide-type">Segment 4</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Segment 4: Constructing Shared Reality and Belonging</h3>
+                        <p class="key-concept">**Key Concept**: Media, through its encoded images and narratives, actively constructs our "shared reality," influencing individual experience and notions of "belonging."</p>
+                        <p class="argument">**Flusser's View**: Photographs "program society to act as though under a magic spell for the benefit of cameras." This involves "redirecting human intentions in the interests of camera functions." By defining what is "true," "good," and "beautiful" (via indicative, imperative, and optative information), media channels shape our values and collective understanding. This impacts everything from political ideologies to consumer desires, influencing who belongs and what experiences are deemed valid within the "photographic universe." Media defines "what is seen, heard, and valued," shaping both cultural consensus and individual experience.</p>
+                        <p class="voiceover-text hidden">Thus, the medium becomes the ultimate arbiter of reality, weaving the threads of images and soundscapes into a tapestry of shared understanding. It dictates what narratives we embrace, what values we hold, and ultimately, where we find our place within this ceaselessly constructed, mediated world.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="4" data-slide-index="5">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌍 Season 10, Episode 8 — *Seeing Like a Medium: Unpacking the Codes of Reality*</h2>
+                    <p class="slide-type">Closing Reflection</p>
+                    <div class="closing-reflection">
+                        <p class="scene-text">*The nebula of information settles into a clear, vibrant image of reality. But as the camera slowly pulls back, the outlines of countless invisible codes and channels become apparent, shimmering like a digital blueprint beneath the surface of what was once perceived as seamless reality.*</p>
+                        <p class="scene-text">**Voice-over:** “To 'see like a medium' is to recognize that all cameras, broadcasts, and feeds are not mirrors, but powerful creators. It is to learn how to unpack the codes embedded within every image and soundscape, to reveal how they construct our shared reality, and thereby reclaim the agency to define our own perception and belonging.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">To 'see like a medium' is to recognize that all cameras, broadcasts, and feeds are not mirrors, but powerful creators. It is to learn how to unpack the codes embedded within every image and soundscape, to reveal how they construct our shared reality, and thereby reclaim the agency to define our own perception and belonging.</p>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000 Edition).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="controls">
+            <button id="prevSlideBtn">Previous Slide</button>
+            <button id="playVoiceoverBtn">Play Voiceover</button>
+            <button id="nextSlideBtn">Next Slide</button>
+        </div>
+        <p class="slide-indicator">Slide <span id="currentSlide">1</span> of <span id="totalSlides">1</span></p>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlideIndex = 0;
+        let speechSynth = window.speechSynthesis;
+        let utterance = new SpeechSynthesisUtterance();
+
+        function showSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+
+            // Stop any ongoing speech
+            if (speechSynth.speaking) {
+                speechSynth.cancel();
+            }
+
+            slides[currentSlideIndex].classList.remove('active');
+            slides[currentSlideIndex].style.opacity = 0;
+
+            currentSlideIndex = index;
+
+            slides[currentSlideIndex].classList.add('active');
+            slides[currentSlideIndex].style.opacity = 1;
+            slides[currentSlideIndex].scrollTop = 0; // Reset scroll for new slide
+
+            updateControls();
+            updateSlideIndicator();
+        }
+
+        function updateControls() {
+            document.getElementById('prevSlideBtn').disabled = currentSlideIndex === 0;
+            document.getElementById('nextSlideBtn').disabled = currentSlideIndex === slides.length - 1;
+        }
+
+        function updateSlideIndicator() {
+            document.getElementById('currentSlide').textContent = currentSlideIndex + 1;
+            document.getElementById('totalSlides').textContent = slides.length;
+        }
+
+        function playVoiceover() {
+            if (speechSynth.speaking) {
+                speechSynth.cancel(); // Stop current speech if any
+            }
+
+            const voiceoverTextElement = slides[currentSlideIndex].querySelector('.voiceover-text');
+            if (voiceoverTextElement) {
+                utterance.text = voiceoverTextElement.textContent;
+                utterance.lang = 'en-US';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                speechSynth.speak(utterance);
+            }
+        }
+
+        document.getElementById('nextSlideBtn').addEventListener('click', () => {
+            showSlide(currentSlideIndex + 1);
+        });
+
+        document.getElementById('prevSlideBtn').addEventListener('click', () => {
+            showSlide(currentSlideIndex - 1);
+        });
+
+        document.getElementById('playVoiceoverBtn').addEventListener('click', playVoiceover);
+
+        // Initialize presentation
+        showSlide(0);
+
+        // Optional: Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                showSlide(currentSlideIndex + 1);
+            } else if (e.key === 'ArrowLeft') {
+                showSlide(currentSlideIndex - 1);
+            } else if (e.key === ' ') { // Spacebar for voiceover
+                e.preventDefault(); // Prevent page scroll
+                playVoiceover();
+            }
+        });
+    </script>
+</body>
+</html>

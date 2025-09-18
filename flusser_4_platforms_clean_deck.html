@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FLUSSER — 4 Platforms (Clean Deck)</title>
+<meta name="color-scheme" content="dark light" />
+<style>
+  :root{
+    /* Saul‑Bass minimal palette */
+    --bg:#0e0f11; --fg:#f7f5ef; --muted:#b8b1a6; --ink:#0e0f11;
+    --accent:#ff3b30; --gold:#ffd166; --ink2:#101114; --card:#16181b;
+    --ring: rgba(255,255,255,.12); --soft: rgba(255,255,255,.06);
+    --radius:20px; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial}
+  .deck{min-height:100svh;display:grid;grid-template-rows:auto 1fr auto}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--ring);backdrop-filter:saturate(1.2) blur(6px);position:sticky;top:0;background:linear-gradient(180deg, rgba(16,17,20,.85), rgba(16,17,20,.55));}
+  header h1{font-size:clamp(16px,2.2vw,22px);letter-spacing:.04em;margin:0;font-weight:700}
+  header .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button, .seg{appearance:none;border:1px solid var(--ring);background:var(--card);color:var(--fg);border-radius:12px;padding:10px 14px;font-size:15px;cursor:pointer;box-shadow:var(--shadow);transition:.2s transform ease, .2s background ease}
+  button:hover{transform:translateY(-1px);background:#1c1f24}
+  button:active{transform:translateY(0)}
+  .big{font-size:clamp(18px,2.4vw,18px);padding:10px 16px;border-radius:14px}
+  .ghost{background:transparent}
+  .pill{border-radius:999px}
+  .main{display:grid;place-items:center;padding:18px}
+  .slide{width:min(1100px,96vw);min-height:64svh;background:linear-gradient(180deg,#15171b,#101114);border:1px solid var(--ring);border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(16px,3vw,28px);display:grid;grid-template-rows:auto 1fr;gap:14px}
+  .kicker{letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;font-size:clamp(12px,1.6vw,13px)}
+  .title{font-weight:900;line-height:1.02;margin:0;font-size:clamp(28px,6.5vw,56px)}
+  .grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .card{background:rgba(255,255,255,.02);border:1px solid var(--ring);border-radius:16px;padding:clamp(12px,2.4vw,18px)}
+  .bullets{font-size:clamp(18px,3vw,26px);line-height:1.22;}
+  .bullets li{margin:10px 0}
+  .quote{font-size:clamp(16px,2.4vw,22px);line-height:1.26;color:var(--muted);border-left:4px solid var(--accent);padding-left:14px}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-top:1px solid var(--ring)}
+  .progress{height:8px;background:var(--soft);border-radius:999px;overflow:hidden}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));}
+  .seg{background:transparent;border-color:var(--ring);opacity:.9}
+  .seg.active{background:var(--accent);border-color:transparent;color:#fff}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .tiny{font-size:12px;color:var(--muted)}
+  .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:#1c1f24;border:1px solid var(--ring);padding:2px 6px;border-radius:6px}
+  /* Mobile helpers */
+  @media (min-width:820px){ .grid{grid-template-columns:1.1fr .9fr;gap:16px} }
+  /* Reduced motion */
+  @media (prefers-reduced-motion: no-preference){ .slide{transition:transform .35s ease, opacity .35s ease} .slide.enter{opacity:0;transform:translateY(10px)} .slide.enter.show{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="deck" role="application" aria-label="Flusser — 4 Platforms deck">
+  <header>
+    <h1>FLUSSER — Towards a Philosophy of Photography</h1>
+    <div class="controls">
+      <button id="prev" class="pill" aria-label="Previous slide">⟵</button>
+      <button id="next" class="pill" aria-label="Next slide">⟶</button>
+      <button id="tts" class="pill" aria-pressed="false" aria-label="Toggle voiceover">🎤 Voice</button>
+      <button id="notes" class="pill ghost" aria-expanded="false" aria-label="Toggle notes density">+ Details</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section id="slide" class="slide enter" aria-live="polite"></section>
+  </main>
+
+  <footer class="nav">
+    <div class="row" id="segments" aria-label="Slide segments"></div>
+    <div style="flex:1"></div>
+    <div style="min-width:180px">
+      <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+      <div class="tiny" id="meta" aria-live="polite" style="margin-top:6px"></div>
+    </div>
+  </footer>
+</div>
+
+<script>
+// -----------------------------
+//  FLUSSER — CLEAN COURSE DECK
+//  Minimal, readable, mobile‑first
+//  Features: Arrow/tap nav, voiceover (Web Speech), density toggle
+// -----------------------------
+const data = [
+  {
+    kicker:"Platform 1",
+    title:"Apparatus = Super‑Black‑Box",
+    bullets:[
+      "Not a tool but a programmed system.",
+      "Photographer = functionary playing I/O only.",
+      "Power shifts to the metaprogram (software)."
+    ],
+    quote:"‘The complex of apparatuses is a super‑black‑box of black boxes.’",
+    notes:[
+      "Nested programs: industry → device → user workflows.",
+      "Critique should target automaticity, not only owners.",
+      "Reality arrives pre‑filtered by categories (speed, angle, distance)."
+    ],
+    voice:"Apparatuses aren’t simple tools. They are stacked programs. Photographers touch inputs and outputs while the code runs the game. In this regime, power lives with programmers and metaprograms, not with hardware owners."
+  },
+  {
+    kicker:"Platform 2",
+    title:"The Technical Image’s Spell",
+    bullets:[
+      "Third‑order abstraction posing as ‘objective’.",
+      "Concepts from texts look like raw reality.",
+      "Images start to instruct texts, not vice versa."
+    ],
+    quote:"‘The objectivity of technical images is an illusion.’",
+    notes:[
+      "B&W and ‘green’ encode optical/chemical theory, not nature.",
+      "Spell = we critique the world in the photo, not the photo itself.",
+      "Decode: ask which program and discourse the image re‑encodes."
+    ],
+    voice:"Photos feel like windows, but they’re coded concepts rendered as surfaces. Their magic is to hide the theory that made them, so we forget to decode the program and accept the picture as the world."
+  },
+  {
+    kicker:"Platform 3",
+    title:"Playing Against the Program",
+    bullets:[
+      "Freedom = make chance and necessity serve intention.",
+      "Aim for informative, improbable images.",
+      "Exhaust and bend the camera’s finite possibilities."
+    ],
+    quote:"‘Freedom is playing against the camera.’",
+    notes:[
+      "Quantum doubt: micro‑hesitations → decisions.",
+      "Smuggle intentions beyond what presets predict.",
+      "Escape ‘photo‑mania’ and redundancy."
+    ],
+    voice:"Treat photography as a game. Don’t feed the camera’s hunger for the same picture again. Use doubt and experiment to produce rare, informative images that the program didn’t foresee."
+  },
+  {
+    kicker:"Platform 4",
+    title:"Channels Encode Meaning",
+    bullets:[
+      "Media aren’t neutral pipes; they assign value.",
+      "Same photo ≠ same meaning across outlets.",
+      "Read the struggle: maker vs. distribution program."
+    ],
+    quote:"‘Distribution apparatuses impregnate the photograph with decisive significance.’",
+    notes:[
+      "Moon‑shot: science → politics → commerce → art.",
+      "Criticism fails when channels stay invisible.",
+      "Break the magic circle by tracing encoding paths."
+    ],
+    voice:"Significance is programmed downstream. Channels decide how a photo counts — as science, propaganda, ad, or art. Good literacy exposes how distribution re‑writes meaning."
+  }
+];
+
+// State
+let i = 0;               // slide index
+let dense = false;       // notes density toggle
+let speaking = false;    // tts state
+let utter = null;        // speech synthesis utterance
+
+const $ = s=>document.querySelector(s);
+const slideEl = $('#slide');
+const barEl = $('#bar');
+const metaEl = $('#meta');
+const segEl = $('#segments');
+
+function render(){
+  const s = data[i];
+  slideEl.classList.remove('show'); // for animation
+  slideEl.innerHTML = `
+    <div>
+      <div class="kicker">${s.kicker}</div>
+      <h2 class="title">${s.title}</h2>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <ul class="bullets">${s.bullets.map(x=>`<li>${x}</li>`).join('')}</ul>
+        ${dense ? `<div class="tiny" style="margin-top:10px;opacity:.9">${s.notes.map(n=>`• ${n}`).join('<br>')}</div>`:''}
+      </div>
+      <div class="card">
+        <div class="quote">${s.quote}</div>
+        <div class="tiny" style="margin-top:10px">Hotkeys: <span class="kbd">←</span> / <span class="kbd">→</span> • <span class="kbd">V</span> voice • <span class="kbd">N</span> notes</div>
+      </div>
+    </div>`;
+  requestAnimationFrame(()=>slideEl.classList.add('show'));
+  // progress + meta
+  barEl.style.width = ((i+1)/data.length*100).toFixed(2)+'%';
+  metaEl.textContent = `Slide ${i+1} / ${data.length}`;
+  // segments
+  segEl.innerHTML = data.map((_,idx)=>`<button class="seg ${idx===i?'active':''}" aria-label="Go to slide ${idx+1}" data-goto="${idx}">${idx+1}</button>`).join('');
+}
+
+function go(n){
+  i = (n+data.length)%data.length;
+  render();
+  if(speaking) speak();
+  location.hash = String(i+1);
+}
+
+// Voiceover (Web Speech API)
+function speak(){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const s = data[i];
+  utter = new SpeechSynthesisUtterance(`${s.kicker}. ${s.title}. ${s.bullets.join('. ')}.` + (dense? ' Notes. '+ s.notes.join('. ') : '')); 
+  utter.lang = 'en-US';
+  utter.rate = 1.02; utter.pitch = 1.0; utter.volume = 1;
+  window.speechSynthesis.speak(utter);
+}
+
+// Controls
+$('#prev').addEventListener('click', ()=>go(i-1));
+$('#next').addEventListener('click', ()=>go(i+1));
+$('#tts').addEventListener('click', (e)=>{
+  speaking = !speaking;
+  e.currentTarget.setAttribute('aria-pressed', String(speaking));
+  e.currentTarget.textContent = speaking ? '⏹ Voice' : '🎤 Voice';
+  if(speaking) speak(); else window.speechSynthesis.cancel();
+});
+$('#notes').addEventListener('click', (e)=>{
+  dense = !dense; render();
+  e.currentTarget.setAttribute('aria-expanded', String(dense));
+  e.currentTarget.textContent = dense ? '– Details' : '+ Details';
+});
+
+// Segment clicks
+segEl.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-goto]');
+  if(btn) go(parseInt(btn.dataset.goto,10));
+});
+
+// Keys
+window.addEventListener('keydown', (e)=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key)) {e.preventDefault(); go(i+1);} 
+  else if(['ArrowLeft','PageUp'].includes(e.key)) {e.preventDefault(); go(i-1);} 
+  else if(e.key.toLowerCase()==='v'){ $('#tts').click(); }
+  else if(e.key.toLowerCase()==='n'){ $('#notes').click(); }
+});
+
+// Touch (simple swipe)
+let touchX=null; let touchY=null;
+window.addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; touchX=t.clientX; touchY=t.clientY;},{passive:true});
+window.addEventListener('touchend', e=>{ const t=e.changedTouches[0]; if(touchX==null) return; const dx=t.clientX-touchX; const dy=t.clientY-touchY; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ dx<0?go(i+1):go(i-1);} touchX=touchY=null;},{passive:true});
+
+// Hash navigation (e.g., #2)
+function fromHash(){
+  const n = parseInt(location.hash.replace('#',''),10);
+  if(!isNaN(n) && n>=1 && n<=data.length){ i=n-1; }
+}
+window.addEventListener('hashchange', ()=>{ fromHash(); render(); });
+
+// Init
+fromHash();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ecology of Hybrid Meaning — Flusser Episodes Player</title>
+<meta name="description" content="Single‑file, mobile‑ready slide + voiceover player for four Flusser episodes." />
+<style>
+  :root{
+    /* Aesthetic tokens (Saul‑Bass inspired) */
+    --bg:#0b0b0c;           /* VHS Black */
+    --fg:#f6f3ee;           /* Zen White */
+    --muted:#b9b3a9;        /* Nostalgia Gray */
+    --accent:#e62b1e;       /* Rewind Red */
+    --gold:#ffd166;         /* Warm highlight */
+    --card:#121214;         /* Card base */
+    --glass:rgba(255,255,255,.06);
+    --border:rgba(255,255,255,.12);
+
+    --radius:18px;
+    --shadow:0 8px 28px rgba(0,0,0,.35);
+
+    --maxw:980px;           /* reading width */
+
+    /* Type scale that adapts on small screens */
+    --step--1: clamp(.9rem, 0.74rem + 0.5vw, 1rem);
+    --step-0:  clamp(1rem, 0.84rem + 0.8vw, 1.125rem);
+    --step-1:  clamp(1.125rem, 0.9rem + 1.3vw, 1.35rem);
+    --step-2:  clamp(1.35rem, 1rem + 2.2vw, 1.8rem);
+    --step-3:  clamp(1.7rem, 1.2rem + 3.2vw, 2.2rem);
+    --step-4:  clamp(2.1rem, 1.4rem + 4.4vw, 2.8rem);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;
+    line-height:1.5;
+  }
+  .app{
+    min-height:100dvh; padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    display:grid; grid-template-rows:auto 1fr auto; gap:10px;
+  }
+  header{
+    position:sticky; top:0; z-index:10; backdrop-filter:saturate(120%) blur(8px);
+    background:linear-gradient(180deg, rgba(11,11,12,.85), rgba(11,11,12,.65));
+    border-bottom:1px solid var(--border);
+  }
+  .bar{
+    max-width:var(--maxw); margin:0 auto; padding:12px 16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  .title{font-weight:700; letter-spacing:.4px; font-size:var(--step-1)}
+  .sp{flex:1}
+  select, button{ background:var(--card); color:var(--fg); border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:var(--step--1); box-shadow:var(--shadow); }
+  button.icon{padding:10px; aspect-ratio:1/1; display:grid; place-items:center}
+  button:active{transform:translateY(1px)}
+  .muted{color:var(--muted)}
+
+  main{ max-width:var(--maxw); margin:0 auto; padding:12px 16px 18px; }
+  .slide{
+    background:linear-gradient(180deg, var(--card), #0e0e10);
+    border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:20px; display:grid; gap:14px;
+  }
+  .slide-header{ display:flex; gap:12px; align-items:baseline; flex-wrap:wrap }
+  .ep-pill{ font-size:var(--step--1); color:var(--bg); background:var(--gold); padding:6px 10px; border-radius:999px; font-weight:700; }
+  .slide-title{ font-size:var(--step-3); font-weight:800; letter-spacing:.3px; }
+  .slide-sub{ font-size:var(--step-0); color:var(--muted) }
+
+  .content{ display:grid; gap:10px; }
+  .kicker{ text-transform:uppercase; letter-spacing:.12em; color:var(--gold); font-weight:700; font-size:var(--step--1) }
+  .text{ font-size:var(--step-0) }
+  .list{ margin:0; padding-left:18px }
+
+  .controls{
+    display:grid; grid-template-columns:1fr auto auto auto; gap:10px; align-items:center;
+  }
+  .progress{ height:8px; background:var(--glass); border:1px solid var(--border); border-radius:999px; overflow:hidden }
+  .progress > div{ height:100%; width:0%; background:linear-gradient(90deg, var(--accent), var(--gold)); transition:width .2s ease }
+
+  footer{
+    border-top:1px solid var(--border);
+    background:linear-gradient(0deg, rgba(11,11,12,.9), rgba(11,11,12,.5));
+  }
+  .foot{ max-width:var(--maxw); margin:0 auto; padding:12px 16px; display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center }
+
+  /* Drawer for transcript / notes */
+  .drawer{ position:fixed; inset:auto 0 0 0; background:rgba(15,15,18,.98); border-top:1px solid var(--border); box-shadow:0 -12px 30px rgba(0,0,0,.4); transform:translateY(100%); transition:transform .34s ease; z-index:20 }
+  .drawer.open{ transform:translateY(0%) }
+  .drawer .inner{ max-width:var(--maxw); margin:0 auto; padding:16px; display:grid; gap:10px }
+  .drawer h3{ margin:0; font-size:var(--step-1) }
+  .drawer p, .drawer li{ color:var(--muted) }
+
+  /* Grid for facts */
+  .facts{ display:grid; grid-template-columns:1fr; gap:10px }
+  @media(min-width:720px){ .facts{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
+
+  /* Accessibility helpers */
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="bar">
+      <div class="title">Ecology of Hybrid Meaning — <span class="muted">Flusser Episodes</span></div>
+      <div class="sp"></div>
+      <select id="episodeSelect" aria-label="Choose episode"></select>
+      <select id="voiceSelect" aria-label="Choose narration voice"></select>
+      <button class="icon" id="decreaseText" title="Decrease text" aria-label="Decrease text">A−</button>
+      <button class="icon" id="increaseText" title="Increase text" aria-label="Increase text">A+</button>
+      <button class="icon" id="toggleDrawer" title="Show transcript" aria-expanded="false" aria-controls="drawer">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <article class="slide" aria-live="polite" aria-atomic="true">
+      <div class="slide-header">
+        <div class="ep-pill" id="epPill">Episode</div>
+        <div class="slide-title" id="slideTitle">Loading…</div>
+      </div>
+      <div class="slide-sub" id="slideSub"></div>
+      <section class="content" id="slideContent"></section>
+      <div class="controls">
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Slide progress">
+          <div id="progressBar"></div>
+        </div>
+        <button id="prevBtn" title="Previous" aria-label="Previous">◀︎</button>
+        <button id="playBtn" title="Play/Pause narration" aria-label="Play or pause">▶︎</button>
+        <button id="nextBtn" title="Next" aria-label="Next">▶︎▶︎</button>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="foot">
+      <div class="muted" id="footInfo">Swipe ◀︎/▶︎ or use ←/→ to navigate • Space to play/pause narration</div>
+      <div><span id="slideIndex">1</span>/<span id="slideCount">—</span></div>
+    </div>
+  </footer>
+</div>
+
+<!-- Transcript / Notes Drawer -->
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="inner">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <h3 style="margin-right:auto">Transcript & Notes</h3>
+      <button id="closeDrawer" class="icon" aria-label="Close transcript">✕</button>
+    </div>
+    <div id="drawerBody" class="text"></div>
+  </div>
+</aside>
+
+<script>
+/**
+ * Flusser Episodes — Data Model
+ * Structure: episodes[] → slides[] where each slide has title, subtitle, html (body), and voice text
+ * Slides per episode: Opening, Segment 1‑4, Closing, Sources
+ */
+const EPISODES = [
+  {
+    id: "S10E5",
+    pill: "S10 • E5",
+    title: "The Apparatus: Black Box Architect of Reality",
+    slides: [
+      {
+        title: "Opening Scene",
+        subtitle: "A server room hums; the black box frames reality.",
+        html: `<p class="kicker">Voice‑over</p>
+               <p class="text">In the digital age, our experience of reality is shaped by hidden architectures. We believe we see the world; we often see the output of a meticulously programmed black box.</p>`,
+        voice: "In the digital age, our experience of reality is shaped by hidden architectures. We believe we see the world, yet we often encounter the output of a meticulously programmed black box."
+      },
+      {
+        title: "Segment 1 — Apparatus as Black Box",
+        subtitle: "Opacity by design",
+        html: `<div class="facts">
+                <div>
+                  <div class="kicker">Key Concept</div>
+                  <p class="text">The apparatus operates as an impenetrable black box; even its functionaries do not see inside.</p>
+                </div>
+                <div>
+                  <div class="kicker">Flusser's View</div>
+                  <p class="text">We control inputs and outputs; the internal process remains concealed.</p>
+                  <div class="kicker">Implication</div>
+                  <p class="text">We relate functionally but without understanding—our world mediated by opaque logic.</p>
+                </div>
+               </div>`,
+        voice: "The apparatus is an impenetrable black box. We control inputs and outputs, but its inner process remains concealed. Our relation is functional, not understanding."
+      },
+      {
+        title: "Segment 2 — Hierarchical Metaprograms",
+        subtitle: "Filters beneath filters",
+        html: `<div class="facts">
+                <div>
+                  <div class="kicker">Key Concept</div>
+                  <p class="text">Metaprograms pre‑code perception, defining what counts as signal and what is ignored.</p>
+                </div>
+                <div>
+                  <div class="kicker">Flusser's View</div>
+                  <p class="text">Programs function under metaprograms; categories of time and space ensnare culture like a net.</p>
+                  <div class="kicker">Example</div>
+                  <p class="text">Surveillance channels behavior through preset categories; visibility becomes programmed.</p>
+                </div>
+               </div>`,
+        voice: "Beneath the visible lens lie metaprograms that pre‑code perception. They define categories in which seeing becomes possible—and govern what becomes visible at all."
+      },
+      {
+        title: "Segment 3 — Programmed ‘IRL’",
+        subtitle: "Offline is pre‑formatted",
+        html: `<p class="text">When lived moments are framed for capture, ‘IRL’ becomes ‘IRL‑coded.’ Experience is mosaicked into the program's discrete elements.</p>`,
+        voice: "When we live with the intention to capture, the so‑called in‑real‑life becomes pre‑formatted by the apparatus. Experience is mosaicked into programmable units."
+      },
+      {
+        title: "Segment 4 — Power and Programmers",
+        subtitle: "Soft symbols rule",
+        html: `<p class="text">Power accrues to those who control the soft program. Algorithms, not objects, orchestrate perception and action.</p>`,
+        voice: "Power shifts to those who control the soft program. Code and algorithm orchestrate perception and action."
+      },
+      {
+        title: "Closing Reflection",
+        subtitle: "Peering into the box",
+        html: `<p class="text">To understand photographic distortion, first study the box. Its hidden logic generates a mediated reality, where even the most ‘real’ moment becomes encoded output.</p>`,
+        voice: "To understand distortion, we must study the box. Its hidden logic generates a mediated reality, where even the most real moment becomes encoded output."
+      },
+      {
+        title: "Sources",
+        subtitle: "References",
+        html: `<ul class="list">
+                <li>Vilém Flusser, <em>Towards a Philosophy of Photography</em> (2000).</li>
+                <li>Nathan Jurgenson, “The IRL Fetish.”</li>
+              </ul>`,
+        voice: "Sources include Vilém Flusser's Towards a Philosophy of Photography, and Nathan Jurgenson on the I.R.L. fetish."
+      }
+    ]
+  },
+  {
+    id: "S10E6",
+    pill: "S10 • E6",
+    title: "Caves of Light: Photography's Ontological Illusion",
+    slides: [
+      { title:"Opening Scene", subtitle:"Cave painting vs. digital photo", html:`<p class="kicker">Voice‑over</p><p class="text">Photography promises presence, but the promise is a deeper illusion.</p>`, voice:"Photography promises presence, yet the promise is a deeper illusion." },
+      { title:"Segment 1 — Third‑Order Abstraction", subtitle:"Concepts, not phenomena", html:`<p class="text">Technical images signify concepts derived from theory and code. A photo of a tree is not the tree, but a conceptual artifact.</p>`, voice:"Technical images signify concepts derived from theory and code. A photo of a tree is a conceptual artifact." },
+      { title:"Segment 2 — Magic Spell of Transparency", subtitle:"Windows that are walls", html:`<p class="text">Images appear objective and transparent, like windows. Their programmatic basis remains hidden, fueling belief in unmediated access.</p>`, voice:"Images appear as transparent windows, concealing their programmatic basis and fueling belief in unmediated access." },
+      { title:"Segment 3 — The ‘IRL’ Fetish", subtitle:"Addicted to presence", html:`<p class="text">The spell produces a craving for authenticity that images themselves manufacture, mistaking the map for the territory.</p>`, voice:"The spell produces a craving for authenticity manufactured by images themselves, mistaking the map for the territory." },
+      { title:"Segment 4 — Rewriting Reality", subtitle:"Images over texts", html:`<p class="text">Images reverse the old order—now photographs program articles. History becomes repeatable states rather than causes and consequences.</p>`, voice:"Images reverse the old order; photographs program texts. History becomes repeatable states rather than analyses of cause." },
+      { title:"Closing Reflection", subtitle:"Re‑enchantment", html:`<p class="text">Photography re‑enchants reality by convincing us we’ve captured it. The illusion persists even as layers of mediation are revealed.</p>`, voice:"Photography re‑enchants reality by convincing us we have captured it, even as mediation is revealed." },
+      { title:"Sources", subtitle:"References", html:`<ul class="list"><li>Flusser, <em>Towards a Philosophy of Photography</em>.</li><li>André Bazin, “The Ontology of the Photographic Image.”</li><li>Susan Sontag, <em>On Photography</em>.</li><li>Nathan Jurgenson, “The IRL Fetish.”</li></ul>`, voice:"Sources include Flusser, Bazin, Sontag, and Jurgenson." }
+    ]
+  },
+  {
+    id: "S10E7",
+    pill: "S10 • E7",
+    title: "To Shoot Is to Program: The Quantum Hunt for Freedom",
+    slides: [
+      { title:"Opening Scene", subtitle:"The programmed hunt", html:`<p class="kicker">Voice‑over</p><p class="text">Each click is a command; every image an output. Photography becomes a choreography of code.</p>`, voice:"Each click is a command; every image an output. Photography becomes a choreography of code." },
+      { title:"Segment 1 — Functionary Photographer", subtitle:"Will inside the camera's language", html:`<p class="text">The camera does the photographer’s will, but only what the camera can will. Practice is selection among preset categories.</p>`, voice:"The camera does the photographer’s will, but only what the camera can will. Practice is selection among presets." },
+      { title:"Segment 2 — Quantum Doubt", subtitle:"Micro‑decisions for novelty", html:`<p class="text">Freedom emerges in points of hesitation and decision, seeking improbable, informative images beyond defaults.</p>`, voice:"Freedom emerges through points of hesitation and decision, seeking improbable images beyond defaults." },
+      { title:"Segment 3 — Playing Against the Program", subtitle:"Smuggling intention", html:`<p class="text">Agency means bending chance and necessity to intention—making the apparatus yield what wasn’t in its program.</p>`, voice:"Agency means bending chance and necessity to intention—making the apparatus yield what wasn’t in its program." },
+      { title:"Segment 4 — Surveillance Gaze", subtitle:"Redundancy at scale", html:`<p class="text">Normalized categories create redundant images that carry little new information; nuance is lost to programmed capture.</p>`, voice:"Normalized categories create redundant images with little new information; nuance is lost to programmed capture." },
+      { title:"Closing Reflection", subtitle:"Defiance within constraints", html:`<p class="text">To truly see is to know the code and then play against it—reshaping perception through deliberate defiance.</p>`, voice:"To truly see is to know the code and then play against it—reshaping perception through deliberate defiance." },
+      { title:"Sources", subtitle:"References", html:`<ul class="list"><li>Vilém Flusser, <em>Towards a Philosophy of Photography</em>.</li></ul>`, voice:"Source: Vilém Flusser, Towards a Philosophy of Photography." }
+    ]
+  },
+  {
+    id: "S10E8",
+    pill: "S10 • E8",
+    title: "Seeing Like a Medium: Unpacking the Codes of Reality",
+    slides: [
+      { title:"Opening Scene", subtitle:"Nebula of media", html:`<p class="kicker">Voice‑over</p><p class="text">Every medium encodes. What we call reality is routed through channels that assign meaning.</p>`, voice:"Every medium encodes. What we call reality is routed through channels that assign meaning." },
+      { title:"Segment 1 — Channels Encode Significance", subtitle:"Meaning mutates by route", html:`<p class="text">A single photograph changes significance across channels—journal, poster, ad, gallery—proving meaning is assigned, not inherent.</p>`, voice:"A single photograph changes significance across channels—evidence that meaning is assigned, not inherent." },
+      { title:"Segment 2 — Struggle for Meaning", subtitle:"Photographer vs. channel", html:`<p class="text">Distribution rewrites intention. Criticism can reconstruct this struggle and unpack embedded codes and biases.</p>`, voice:"Distribution rewrites intention. Criticism can reconstruct this struggle and unpack embedded codes and biases." },
+      { title:"Segment 3 — Trahison des Clercs", subtitle:"When critique goes soft", html:`<p class="text">Ignoring channel power betrays audiences, allowing biases to pass as neutral reality.</p>`, voice:"Ignoring channel power betrays audiences, allowing biases to pass as neutral reality." },
+      { title:"Segment 4 — Constructing Shared Reality", subtitle:"Indicative, imperative, optative", html:`<p class="text">Media program what is true, good, beautiful—shaping values and belonging through encoded images and narratives.</p>`, voice:"Media program what counts as true, good, and beautiful—shaping values and belonging." },
+      { title:"Closing Reflection", subtitle:"See the codes", html:`<p class="text">To ‘see like a medium’ is to reveal encoding and reclaim agency in perception.</p>`, voice:"To see like a medium is to reveal encoding and reclaim agency in perception." },
+      { title:"Sources", subtitle:"References", html:`<ul class="list"><li>Vilém Flusser, <em>Towards a Philosophy of Photography</em>.</li></ul>`, voice:"Source: Vilém Flusser, Towards a Philosophy of Photography." }
+    ]
+  }
+];
+
+/** Player state */
+const state = {
+  epIndex: 0,
+  slideIndex: 0,
+  voices: [],
+  currentUtterance: null,
+  speaking: false,
+  textScale: 0, // steps of +/-
+};
+
+/** DOM refs */
+const episodeSelect = document.getElementById('episodeSelect');
+const voiceSelect = document.getElementById('voiceSelect');
+const epPill = document.getElementById('epPill');
+const slideTitle = document.getElementById('slideTitle');
+const slideSub = document.getElementById('slideSub');
+const slideContent = document.getElementById('slideContent');
+const progressBar = document.getElementById('progressBar');
+const playBtn = document.getElementById('playBtn');
+const nextBtn = document.getElementById('nextBtn');
+const prevBtn = document.getElementById('prevBtn');
+const slideIndexEl = document.getElementById('slideIndex');
+const slideCountEl = document.getElementById('slideCount');
+const toggleDrawerBtn = document.getElementById('toggleDrawer');
+const closeDrawerBtn = document.getElementById('closeDrawer');
+const drawer = document.getElementById('drawer');
+const drawerBody = document.getElementById('drawerBody');
+const decreaseText = document.getElementById('decreaseText');
+const increaseText = document.getElementById('increaseText');
+
+/** Initialize */
+function init(){
+  // Episode options
+  EPISODES.forEach((ep, i)=>{
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = `${ep.pill} — ${ep.title}`;
+    episodeSelect.appendChild(opt);
+  });
+  slideCountEl.textContent = String(currentEpisode().slides.length);
+  renderSlide();
+  loadVoices();
+}
+
+function currentEpisode(){ return EPISODES[state.epIndex]; }
+function currentSlide(){ return currentEpisode().slides[state.slideIndex]; }
+
+/** Rendering */
+function renderSlide(){
+  const ep = currentEpisode();
+  const sl = currentSlide();
+  epPill.textContent = `${ep.pill}`;
+  slideTitle.textContent = sl.title;
+  slideSub.textContent = sl.subtitle || '';
+  slideContent.innerHTML = sl.html;
+  slideIndexEl.textContent = String(state.slideIndex+1);
+  slideCountEl.textContent = String(ep.slides.length);
+
+  // Update transcript drawer
+  drawerBody.innerHTML = `<p><strong>${ep.title}</strong></p>` + ep.slides.map((s, idx)=>{
+    return `<p><em>${idx+1}. ${s.title}</em><br/>${s.subtitle?`<span class='muted'>${s.subtitle}</span><br/>`:''}${s.voice || ''}</p>`;
+  }).join('');
+
+  // Progress
+  progressBar.style.width = `${((state.slideIndex+1)/ep.slides.length)*100}%`;
+
+  // Reset narration icon
+  updatePlayIcon(false);
+}
+
+/** Episode & slide navigation */
+function gotoSlide(i){
+  const ep = currentEpisode();
+  state.slideIndex = Math.max(0, Math.min(i, ep.slides.length-1));
+  stopNarration();
+  renderSlide();
+}
+function nextSlide(){ gotoSlide(state.slideIndex+1); }
+function prevSlide(){ gotoSlide(state.slideIndex-1); }
+
+function changeEpisode(i){
+  state.epIndex = i; state.slideIndex = 0; episodeSelect.value = String(i);
+  stopNarration();
+  renderSlide();
+}
+
+/** Swipe support */
+let touchStartX = null;
+window.addEventListener('touchstart', e=>{ if(e.touches.length===1){ touchStartX = e.touches[0].clientX; } });
+window.addEventListener('touchend', e=>{
+  if(touchStartX===null) return; const dx = e.changedTouches[0].clientX - touchStartX; touchStartX=null;
+  if(Math.abs(dx)>40){ dx<0 ? nextSlide() : prevSlide(); }
+});
+
+/** Keyboard shortcuts */
+window.addEventListener('keydown', e=>{
+  if(e.target && ['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if(e.code==='ArrowRight') nextSlide();
+  if(e.code==='ArrowLeft') prevSlide();
+  if(e.code==='Space'){ e.preventDefault(); toggleSpeak(); }
+});
+
+/** Text scaling */
+function applyTextScale(){
+  const base = 0; // using CSS clamp already; we apply a multiplier via root font-size
+  const step = 0.06; // 6% per step
+  const mult = 1 + state.textScale*step;
+  document.documentElement.style.fontSize = `${Math.max(0.8, mult)}em`;
+}
+
+increaseText.addEventListener('click', ()=>{ state.textScale = Math.min(6, state.textScale+1); applyTextScale(); });
+decreaseText.addEventListener('click', ()=>{ state.textScale = Math.max(-3, state.textScale-1); applyTextScale(); });
+
+/** Transcript drawer */
+function openDrawer(){ drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); toggleDrawerBtn.setAttribute('aria-expanded','true'); }
+function closeDrawer(){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); toggleDrawerBtn.setAttribute('aria-expanded','false'); }
+
+toggleDrawerBtn.addEventListener('click', ()=>{ drawer.classList.contains('open')?closeDrawer():openDrawer(); });
+closeDrawerBtn.addEventListener('click', closeDrawer);
+
+/** Narration (Web Speech Synthesis) */
+function loadVoices(){
+  const populate = ()=>{
+    state.voices = window.speechSynthesis? speechSynthesis.getVoices(): [];
+    voiceSelect.innerHTML='';
+    const def = document.createElement('option');
+    def.value = ''; def.textContent = state.voices.length? 'System Voice (auto)' : 'Narration unavailable';
+    voiceSelect.appendChild(def);
+    state.voices.forEach((v,i)=>{
+      const opt = document.createElement('option');
+      opt.value = v.name; opt.textContent = `${v.name} — ${v.lang}${v.default? ' • default':''}`;
+      voiceSelect.appendChild(opt);
+    });
+  };
+  populate();
+  if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged = populate; }
+}
+
+function updatePlayIcon(isPlaying){
+  state.speaking = !!isPlaying;
+  playBtn.textContent = isPlaying ? '⏸︎' : '▶︎';
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Narration not supported in this browser.'); return; }
+  stopNarration();
+  const u = new SpeechSynthesisUtterance(text);
+  const chosen = state.voices.find(v=> v.name === voiceSelect.value);
+  if(chosen) u.voice = chosen;
+  u.rate = 1.0; u.pitch = 1.02; u.volume = 1.0;
+  u.onend = ()=>{
+    updatePlayIcon(false);
+  };
+  state.currentUtterance = u; updatePlayIcon(true); speechSynthesis.speak(u);
+}
+
+function stopNarration(){
+  if(state.currentUtterance){ try{ speechSynthesis.cancel(); }catch{} }
+  state.currentUtterance=null; updatePlayIcon(false);
+}
+
+function toggleSpeak(){
+  if(state.speaking){ stopNarration(); return; }
+  const sl = currentSlide(); const text = sl.voice || `${sl.title}. ${sl.subtitle||''}`;
+  speak(text);
+}
+
+/** Wire controls */
+playBtn.addEventListener('click', toggleSpeak);
+nextBtn.addEventListener('click', ()=>{ nextSlide(); });
+prevBtn.addEventListener('click', ()=>{ prevSlide(); });
+episodeSelect.addEventListener('change', e=> changeEpisode(parseInt(e.target.value,10)) );
+voiceSelect.addEventListener('change', ()=>{ /* no‑op */ });
+
+/** Autoplay next on narration end? Optional: comment in to auto‑advance. */
+// if('speechSynthesis' in window){
+//   const _origSpeak = speak; speak = function(text){ _origSpeak(text); state.currentUtterance.onend = ()=>{ updatePlayIcon(false); nextSlide(); } }
+// }
+
+/** Start */
+init();
+</script>
+</body>
+</html>

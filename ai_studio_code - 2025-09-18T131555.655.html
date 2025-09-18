@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Spencer-Brown Models of Jurgenson & Flusser</title>
+    <style>
+        /* General Resets & Variables */
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2a2a2a;
+            --text-color: #e0e0e0;
+            --accent-color: #00bcd4; /* Cyan for modern tech feel */
+            --font-family-primary: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-family-secondary: 'Georgia', serif;
+            --font-size-base: 1.8vw; /* Responsive base font size */
+            --padding-base: 2vh;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            color: var(--text-color);
+            background-color: var(--primary-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Hide scrollbars, manage content with JS */
+            font-size: var(--font-size-base);
+            line-height: 1.4;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--padding-base);
+            position: relative;
+            background-color: var(--secondary-bg);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .slide-wrapper {
+            width: 100%;
+            height: calc(100% - 12vh); /* Adjust for controls */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            flex-grow: 1; /* Allow wrapper to take available space */
+        }
+
+        .slide {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background-color: var(--primary-bg);
+            border-radius: 10px;
+            padding: calc(var(--padding-base) * 2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none; /* Hidden by default, shown by JS */
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            text-align: left;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            overflow-y: auto; /* Allow scrolling for long slides */
+            color: var(--text-color); /* Ensure text color is applied */
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .episode-title {
+            font-size: calc(var(--font-size-base) * 1.5);
+            color: var(--accent-color);
+            margin-bottom: var(--padding-base);
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .slide-type {
+            font-size: calc(var(--font-size-base) * 0.9);
+            color: #b0b0b0;
+            margin-bottom: var(--padding-base);
+            width: 100%;
+            text-align: center;
+        }
+
+        .scene-text {
+            font-family: var(--font-family-secondary);
+            font-style: italic;
+            font-size: calc(var(--font-size-base) * 1.1);
+            margin-bottom: var(--padding-base);
+            color: #c0c0c0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .segment-title {
+            font-size: calc(var(--font-size-base) * 1.2);
+            color: var(--accent-color);
+            margin-top: var(--padding-base);
+            margin-bottom: calc(var(--padding-base) * 0.5);
+            font-weight: bold;
+        }
+
+        .key-concept strong,
+        .argument strong,
+        .historic-precedent strong,
+        .critique strong,
+        .key-features strong {
+            color: var(--accent-color);
+        }
+
+        p, ul, li {
+            font-size: calc(var(--font-size-base) * 0.95);
+            margin-bottom: calc(var(--padding-base) * 0.7);
+        }
+
+        ul {
+            list-style: disc;
+            margin-left: 2em;
+            text-align: left;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        .quote {
+            font-family: var(--font-family-secondary);
+            font-style: italic;
+            margin: var(--padding-base) 0;
+            padding-left: var(--padding-base);
+            border-left: 3px solid var(--accent-color);
+            color: #b0b0b0;
+            font-size: calc(var(--font-size-base) * 0.95);
+        }
+        .quote cite {
+            display: block;
+            margin-top: 0.5em;
+            font-size: 0.8em;
+            color: #909090;
+            text-align: right;
+            font-style: normal;
+        }
+
+        .sources {
+            margin-top: calc(var(--padding-base) * 1.5);
+            border-top: 1px solid #444;
+            padding-top: var(--padding-base);
+            width: 100%;
+        }
+
+        .sources h4 {
+            font-size: calc(var(--font-size-base) * 0.9);
+            color: var(--accent-color);
+            margin-bottom: calc(var(--padding-base) * 0.5);
+        }
+
+        .source-list {
+            list-style: none;
+            font-size: calc(var(--font-size-base) * 0.8);
+            color: #a0a0a0;
+            margin-left: 0;
+        }
+
+        .source-list li {
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin-top: var(--padding-base);
+            gap: 1vh; /* Gap between buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            padding: 1vh 2vw; /* Responsive padding */
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: calc(var(--font-size-base) * 0.8);
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            flex-grow: 1; /* Allow buttons to grow */
+            min-width: 100px; /* Minimum width for buttons */
+        }
+
+        button:hover {
+            background-color: #33d9ef; /* Lighter cyan on hover */
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .slide-indicator {
+            color: var(--text-color);
+            font-size: calc(var(--font-size-base) * 0.9);
+            text-align: center;
+            width: 100%;
+            margin-top: calc(var(--padding-base) * 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Media Queries for smaller screens */
+        @media (max-width: 768px) {
+            body {
+                font-size: 3vw; /* Larger base font size for mobile */
+            }
+
+            .slide {
+                width: 95%;
+                height: 95%;
+                padding: var(--padding-base);
+            }
+
+            .episode-title {
+                font-size: calc(3vw * 1.5);
+            }
+
+            .segment-title {
+                font-size: calc(3vw * 1.2);
+            }
+
+            .scene-text, .quote, p, ul, li {
+                font-size: calc(3vw * 1.0);
+            }
+
+            .key-concept, .argument, .historic-precedent, .critique, .key-features, .source-list {
+                font-size: calc(3vw * 0.9);
+            }
+
+            .sources h4 {
+                font-size: calc(3vw * 0.9);
+            }
+
+            .controls {
+                flex-direction: row;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                width: 95%;
+                margin-top: 1vh;
+            }
+
+            button {
+                padding: 1.5vh 3vw;
+                font-size: calc(3vw * 0.85);
+                flex-basis: 48%; /* Two buttons per row */
+            }
+
+            .slide-indicator {
+                font-size: calc(3vw * 0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+        <div class="slide-wrapper">
+            <!-- Episode 1: Jurgenson's Anti-Dualist Framework -->
+            <div class="slide" data-episode="1" data-slide-index="0">
+                <div class="slide-content">
+                    <h2 class="episode-title">👁️ Deconstructing Digital Dualism: Jurgenson's Integrated Reality</h2>
+                    <p class="slide-type">Opening Scene</p>
+                    <div class="opening-scene-content">
+                        <p class="scene-text">*A seamless blend of physical spaces and digital interfaces. A person interacts with a screen embedded in a public park bench, while another navigates a city street using augmented reality glasses.*</p>
+                    </div>
+                    <div class="closing-reflection">
+                        <p class="scene-text">**Voice-over:** “In our contemporary landscape, the lines between 'online' and 'offline' blur into an indistinguishable continuum. Nathan Jurgenson challenges us to see beyond these artificial divides, urging us to embrace a reality far more integrated than we often perceive.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">In our contemporary landscape, the lines between 'online' and 'offline' blur into an indistinguishable continuum. Nathan Jurgenson challenges us to see beyond these artificial divides, urging us to embrace a reality far more integrated than we often perceive.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="1" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="episode-title">👁️ Deconstructing Digital Dualism: Jurgenson's Integrated Reality</h2>
+                    <p class="slide-type">Segment 1: Key Distinctions</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">The Blended World: Concepts Beyond the Divide</h3>
+                        <ul>
+                            <li><strong>Digital Dualism:</strong> The false belief that online and offline experiences are separate, distinct, and often hierarchically ordered realms. Jurgenson argues, "The digital is not a 'virtual world' separate from 'real life'; it is an integral part of our augmented reality."</li>
+                            <li><strong>Augmented Reality:</strong> Jurgenson’s core concept for our lived reality, which is already integrated at the intersection of the digital and physical. This is the "unmarked" state—simply, reality itself.</li>
+                            <li><strong>IRL Fetish:</strong> A "pathological fixation" on disconnected "real life," valorizing it over digitally-mediated experience. This often stems from digital dualism, creating an anxiety about digital engagement.</li>
+                            <li><strong>Social Photo:</strong> A transformed photographic practice, shifting its primary function from mere documentation to a powerful medium of communication and social connection.</li>
+                        </ul>
+                        <blockquote class="quote">
+                            "Digital dualism is the assumption that the digital and the real are separate. This assumption is false."
+                            <cite>— Nathan Jurgenson</cite>
+                        </blockquote>
+                        <p class="voiceover-text hidden">Jurgenson introduces critical concepts to dismantle our old ways of thinking. He names 'Digital Dualism' as the harmful illusion that online and offline are separate. In contrast, 'Augmented Reality' describes our actual, integrated experience. The 'IRL Fetish' is the misguided longing for an 'unmediated' life, a yearning created by digital dualism itself. And the 'Social Photo' shows how even our cameras have adapted to this blended reality, becoming tools for connection rather than just recording.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Nathan Jurgenson, *The Social Photo: On Photography and Social Media* (2019).</li>
+                            <li>Nathan Jurgenson, "Digital Dualism and the IRL Fetish" (2011).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="1" data-slide-index="2">
+                <div class="slide-content">
+                    <h2 class="episode-title">👁️ Deconstructing Digital Dualism: Jurgenson's Integrated Reality</h2>
+                    <p class="slide-type">Segment 2: Dynamic Transformations</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">How False Binaries Dissolve into Integrated Experience</h3>
+                        <ul>
+                            <li><strong>Dualistic Critique:</strong> The act of critically examining Digital Dualism directly leads to its dissolution, revealing our integrated Augmented Reality. This isn't just theory; it's a shift in perception.</li>
+                            <li><strong>Logical Transformation:</strong> Moving beyond "either/or" thinking, Jurgenson encourages an "inclusive logic" where digital *and* physical coexist and interpenetrate, rather than being mutually exclusive.</li>
+                            <li><strong>Therapeutic Dissolution:</strong> By understanding the roots of the IRL Fetish, we can resolve anxieties about digital connection, accepting and engaging with our inherently mediated existence.</li>
+                            <li><strong>Media Transformation:</strong> Photography, once primarily for documentation, increasingly serves as a medium for social interaction and communication—a 'social photo' that actively shapes, rather than merely records, relationships.</li>
+                        </ul>
+                        <blockquote class="quote">
+                            "The digital is not replacing the real, but augmenting it."
+                            <cite>— Nathan Jurgenson</cite>
+                        </blockquote>
+                        <p class="voiceover-text hidden">Jurgenson reveals how our perceptions can transform. By challenging digital dualism head-on, we see our integrated reality more clearly. This means shifting our logic from 'either/or' to 'both/and.' When we let go of the 'IRL Fetish,' we resolve our anxieties about digital life and embrace our augmented reality. This perspective even changes how we understand media, transforming photography into a powerful tool for social connection.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Nathan Jurgenson, *The Social Photo: On Photography and Social Media* (2019).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episode 2: Flusser's Apparatus Theory -->
+            <div class="slide" data-episode="2" data-slide-index="0">
+                <div class="slide-content">
+                    <h2 class="episode-title">⚙️ The Apparatus & Agency: Flusser's Programmed World</h2>
+                    <p class="slide-type">Opening Scene</p>
+                    <div class="opening-scene-content">
+                        <p class="scene-text">*A sleek, modern camera sits on a pedestal. Its intricate internal mechanisms are briefly highlighted, then a hand reaches out, subtly adjusting a dial. A complex digital image is projected behind it, full of hidden code.*</p>
+                    </div>
+                    <div class="closing-reflection">
+                        <p class="scene-text">**Voice-over:** “Vilém Flusser invites us into a world where technology isn't just a tool, but an 'apparatus' with its own embedded 'programs.' He challenges us to find pockets of 'freedom' within these systems, transforming mere function into genuine human creativity.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">Vilém Flusser invites us into a world where technology isn't just a tool, but an 'apparatus' with its own embedded 'programs.' He challenges us to find pockets of 'freedom' within these systems, transforming mere function into genuine human creativity.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="2" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="episode-title">⚙️ The Apparatus & Agency: Flusser's Programmed World</h2>
+                    <p class="slide-type">Segment 1: Key Distinctions</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">The Machine, Its Program, and Our Place Within</h3>
+                        <ul>
+                            <li><strong>Apparatus:</strong> A technological system (like a camera) containing embedded programs that pre-determine and constrain its possible outputs. Flusser calls it "a black box which simulates the human act of playing."</li>
+                            <li><strong>Human Gesture:</strong> A creative intervention where humans attempt to insert unprogrammed information or meaning into the apparatus's operation. This is our engagement.</li>
+                            <li><strong>Program:</strong> The pre-inscribed possibilities or rules within an apparatus. It *appears* to offer freedom of choice, but these choices are ultimately confined within its pre-set categories.</li>
+                            <li><strong>Freedom:</strong> Not the absence of the program, but the capacity to "outwit" programmed constraints through skilled and intentional manipulation, pushing beyond the expected.</li>
+                            <li><strong>Technical Image:</strong> A "third-order abstraction"—an image of concepts and theories, not a direct reflection of the world. It is the output of an apparatus's program.</li>
+                            <li><strong>Post-History:</strong> A cybernetic condition where constant feedback loops between apparatus and human replace linear historical causality, leading to a state of eternal recurrence.</li>
+                        </ul>
+                        <blockquote class="quote">
+                            "The apparatus is a toy, or rather, a black box which simulates the human act of playing... The photographer has to will what the camera can do."
+                            <cite>— Vilém Flusser, *Towards a Philosophy of Photography*</cite>
+                        </blockquote>
+                        <p class="voiceover-text hidden">Flusser defines the 'Apparatus' as any technical system, like a camera, that operates on hidden 'Programs,' offering only predefined choices. 'Human Gesture' is our attempt to inject creativity into this system. 'Freedom' isn't escaping the apparatus, but skillfully outwitting its program. The 'Technical Image' is the conceptual output of this interaction, not a direct depiction of reality. Ultimately, we live in 'Post-History,' a cybernetic loop driven by constant feedback between ourselves and our tools.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="2" data-slide-index="2">
+                <div class="slide-content">
+                    <h2 class="episode-title">⚙️ The Apparatus & Agency: Flusser's Programmed World</h2>
+                    <p class="slide-type">Segment 2: Dynamic Interplay</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Negotiating Control: Human & Machine Dialogue</h3>
+                        <ul>
+                            <li><strong>Gestural Intervention:</strong> When human gesture interacts with the apparatus, its programmed operation can become creative and unexpected. This is where meaning beyond the program emerges.</li>
+                            <li><strong>Program Resistance:</strong> The act of a photographer moving from simply following the camera's program to actively "outwitting" it, thus achieving a form of Flusserian "freedom."</li>
+                            <li><strong>Historical Progression:</strong> Flusser traces media evolution from "Magic" (mythic images) to "History" (linear texts) to "Post-History" (cybernetic images), each epoch defining our relationship with information and reality.</li>
+                            <li><strong>Feedback Loop:</strong> A constant, dialectical relationship between the apparatus and the operator, where each continuously influences and co-determines the other, leading to evolving outcomes.</li>
+                        </ul>
+                        <blockquote class="quote">
+                            "Freedom is the strategy of making chance and necessity subordinate to human intention. Freedom is playing against the camera."
+                            <cite>— Vilém Flusser, *Towards a Philosophy of Photography*</cite>
+                        </blockquote>
+                        <p class="voiceover-text hidden">Here, we explore the dynamic dance between human and machine. 'Gestural Intervention' is our creative push, allowing apparatus operation to become more than programmed output. 'Program Resistance' is the photographer's struggle to 'outwit' the camera's inherent limits, defining true freedom. Flusser also maps out a 'Historical Progression' of media, from magic to linear history, culminating in our cybernetic 'Post-History,' characterized by endless 'Feedback Loops' between us and our tools.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episode 3: Converging Insights: Beyond the Binaries -->
+            <div class="slide" data-episode="3" data-slide-index="0">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌀 Converging Insights: Beyond the Binaries</h2>
+                    <p class="slide-type">Opening Scene</p>
+                    <div class="opening-scene-content">
+                        <p class="scene-text">*Two distinct streams of thought, one glowing cyan, the other magenta, begin to intertwine and merge, forming a vibrant, integrated violet. The scene emphasizes their shared logical foundations.*</p>
+                    </div>
+                    <div class="closing-reflection">
+                        <p class="scene-text">**Voice-over:** “Despite their different contexts, Jurgenson and Flusser arrive at strikingly similar conclusions. Both reject simplistic 'either/or' distinctions, proposing instead a more nuanced, integrated understanding of our mediated world and the active agency within it.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">Despite their different contexts, Jurgenson and Flusser arrive at strikingly similar conclusions. Both reject simplistic 'either/or' distinctions, proposing instead a more nuanced, integrated understanding of our mediated world and the active agency within it.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="3" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌀 Converging Insights: Beyond the Binaries</h2>
+                    <p class="slide-type">Segment 1: Rejecting False Dichotomies</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">The Shared Critique of Artificial Separations</h3>
+                        <p>Both Jurgenson and Flusser powerfully critique the tendency to frame our world in simplistic "either/or" terms. This shared **anti-binary critique** is fundamental to their projects.</p>
+                        <ul>
+                            <li><strong>Jurgenson's Anti-Binary:</strong> He argues against the separation of online and offline, positing that our true experience is one of **Augmented Reality**. He would say, "It's not 'online OR offline'; it's beyond that distinction."</li>
+                            <li><strong>Flusser's Anti-Binary:</strong> He challenges the division between human and machine, seeing them as interlinked in an **Apparatus Complex**. For Flusser, "It's not 'human OR machine'; it's the dynamic interplay that defines our reality."</li>
+                        </ul>
+                        <blockquote class="quote">
+                            "The separation of man from his apparatus, of his work from his play, of his information from his communication, of his culture from his civilization, of his value from his meaning, of his 'humanity' from his 'bestiality' are the fundamental separations that photography abolishes."
+                            <cite>— Vilém Flusser, *Towards a Philosophy of Photography*</cite>
+                        </blockquote>
+                        <p class="voiceover-text hidden">Jurgenson and Flusser both challenge our ingrained habit of thinking in terms of strict binaries. Jurgenson dismantles the 'online or offline' divide, showing our reality is inherently augmented. Flusser pushes us beyond 'human or machine,' revealing an inseparable apparatus complex. They both argue that these simplistic distinctions prevent us from understanding the true complexity of our mediated existence.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Nathan Jurgenson, various works on digital dualism and augmented reality.</li>
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="3" data-slide-index="2">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌀 Converging Insights: Beyond the Binaries</h2>
+                    <p class="slide-type">Segment 2: Dialectical Resolutions & Constrained Agency</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Finding Synthesis and Agency in Complex Systems</h3>
+                        <p>Beyond critique, both theorists offer powerful **dialectical resolutions** that synthesize traditional oppositions into new understandings, while acknowledging the **constrained nature of human agency** within technological systems.</p>
+                        <ul>
+                            <li><strong>Jurgenson's Synthesis:</strong> The digital *and* the physical combine to form an **Integrated Experience**. It's not a zero-sum game, but a profound melding.</li>
+                            <li><strong>Flusser's Synthesis:</strong> The apparatus *and* human gesture converge to produce **Technical Creativity**. Freedom lies in playing *with* the system, not merely outside it.</li>
+                        </ul>
+                        <p class="argument">**Shared Theorem on Agency:** For both, all technical practices are simultaneously **programmed by systems AND creative through human intervention.** This means our choices, while guided, always possess a potential for novel, unpredicted outcomes.</p>
+                        <blockquote class="quote">
+                            "The apparatus itself and the human being are no longer separated as subject and object, but become partners in a dialogue, each a function of the other."
+                            <cite>— Vilém Flusser, *Towards a Philosophy of Photography*</cite>
+                        </blockquote>
+                        <p class="voiceover-text hidden">Not only do they critique binaries, but they also offer new ways to understand our world. Jurgenson shows how digital and physical elements merge into an integrated experience. Flusser reveals how the apparatus and human gesture combine to create 'Technical Creativity.' This leads to a powerful shared theorem: every technical practice is both programmed and offers space for human creativity. Our agency isn't erased by technology; it's redefined through our dynamic interplay with it.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Nathan Jurgenson, various works.</li>
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episode 4: Towards Post-Binary Media Theory -->
+            <div class="slide" data-episode="4" data-slide-index="0">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌌 Towards Post-Binary Media Theory</h2>
+                    <p class="slide-type">Opening Scene</p>
+                    <div class="opening-scene-content">
+                        <p class="scene-text">*A vast, intricate neural network glows softly, revealing hidden connections and complex feedback loops, transcending simplistic divisions to form a coherent, living system.*</p>
+                    </div>
+                    <div class="closing-reflection">
+                        <p class="scene-text">**Voice-over:** “The formal modeling of Jurgenson and Flusser's arguments reveals a profound meta-theoretical convergence. They challenge us to move beyond outdated frameworks and embrace a sophisticated 'post-binary' understanding of our techno-social reality.”</p>
+                    </div>
+                    <p class="voiceover-text hidden">The formal modeling of Jurgenson and Flusser's arguments reveals a profound meta-theoretical convergence. They challenge us to move beyond outdated frameworks and embrace a sophisticated 'post-binary' understanding of our techno-social reality.</p>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="4" data-slide-index="1">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌌 Towards Post-Binary Media Theory</h2>
+                    <p class="slide-type">Segment 1: Shared Patterns in Theory</p>
+                    <div class="segment-content">
+                        <h3 class="segment-title">Unpacking Their Common Theoretical Toolkit</h3>
+                        <p>The Spencer-Brown formalization highlights a consistent analytical approach across Jurgenson and Flusser:</p>
+                        <ul>
+                            <li><strong>1. Identification of False Binaries:</strong> Both pinpoint distinctions (e.g., online/offline, human/machine) that appear natural but are constructed and misleading.</li>
+                            <li><strong>2. Critical Dissolution:</strong> They actively dismantle these binaries through rigorous theoretical analysis, showing their inherent limitations.</li>
+                            <li><strong>3. Proposal of Synthetic Categories:</strong> They move beyond simple either/or to offer new, integrated categories that capture the true complexity of socio-technical relationships (e.g., Augmented Reality, Technical Creativity).</li>
+                            <li><strong>4. Maintenance of Space for Human Agency:</strong> Crucially, both theorists, despite acknowledging systemic constraints, preserve and articulate the potential for human creativity and resistance within technological systems.</li>
+                        </ul>
+                        <blockquote class="quote">
+                            "The freedom of man... is not to refuse the functions offered by the apparatus, but to select them and to create unpredictable ones."
+                            <cite>— Vilém Flusser, *Towards a Philosophy of Photography*</cite>
+                        </blockquote>
+                        <p class="voiceover-text hidden">This formal analysis reveals a shared intellectual toolkit. Both theorists excel at identifying and then dismantling false binaries, replacing them with more sophisticated, synthetic categories. Critically, both Jurgenson and Flusser maintain a vital space for human agency, emphasizing our capacity for creative intervention and resistance even within deeply programmed systems. They remind us that our role is not passive, but active, in shaping our technological future.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Nathan Jurgenson, various works.</li>
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-episode="4" data-slide-index="2">
+                <div class="slide-content">
+                    <h2 class="episode-title">🌌 Towards Post-Binary Media Theory</h2>
+                    <p class="slide-type">Closing Reflection</p>
+                    <div class="closing-reflection">
+                        <h3 class="segment-title">The Enduring Legacy: Post-Binary Media Theory</h3>
+                        <p>Both Jurgenson and Flusser are foundational to what we can call **"post-binary media theory."** Their work moves us beyond simple dichotomies to understand the intricate, interwoven nature of our existence with technology.</p>
+                        <p class="argument">Their fundamental shared insight is profound:</p>
+                        <blockquote class="quote">
+                            "All experience in technological societies is hybrid."
+                            <cite>— (A core synthesis of Jurgenson & Flusser's work)</cite>
+                        </blockquote>
+                        <p>Our reality is neither purely human nor purely technical, neither strictly online nor entirely offline. It is constituted through ongoing processes of **human-technology entanglement** that demand nuanced theoretical frameworks for adequate understanding.</p>
+                        <p class="voiceover-text hidden">Both Jurgenson and Flusser are architects of what we now call 'Post-Binary Media Theory.' Their enduring legacy is the understanding that all experience in technological societies is fundamentally hybrid. It's never purely human, nor purely technical; never just online, nor just offline. Our world is a ceaseless, intricate entanglement of human and technology, demanding sophisticated tools to truly comprehend its depth.</p>
+                    </div>
+                    <div class="sources">
+                        <h4>Sources:</h4>
+                        <ul class="source-list">
+                            <li>Nathan Jurgenson, various works.</li>
+                            <li>Vilém Flusser, *Towards a Philosophy of Photography* (2000).</li>
+                            <li>Stuart Hall, "Encoding/Decoding" (1980).</li>
+                            <li>Karen Barad, *Meeting the Universe Halfway: Quantum Physics and the Entanglement of Matter and Meaning* (2007).</li>
+                            <li>André Bazin, "The Ontology of the Photographic Image" (1945).</li>
+                            <li>Susan Sontag, *On Photography* (1977).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="controls">
+            <button id="prevSlideBtn">Previous Slide</button>
+            <button id="playVoiceoverBtn">Play Voiceover</button>
+            <button id="nextSlideBtn">Next Slide</button>
+        </div>
+        <p class="slide-indicator">Slide <span id="currentSlide">1</span> of <span id="totalSlides">1</span></p>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlideIndex = 0;
+        let speechSynth = window.speechSynthesis;
+        let utterance = new SpeechSynthesisUtterance();
+
+        function showSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+
+            // Stop any ongoing speech
+            if (speechSynth.speaking) {
+                speechSynth.cancel();
+            }
+
+            // Hide current slide (if it exists and is active)
+            if (slides[currentSlideIndex]) {
+                slides[currentSlideIndex].classList.remove('active');
+                slides[currentSlideIndex].style.opacity = 0;
+            }
+
+            currentSlideIndex = index;
+
+            // Show new slide
+            slides[currentSlideIndex].classList.add('active');
+            slides[currentSlideIndex].style.opacity = 1;
+            slides[currentSlideIndex].scrollTop = 0; // Reset scroll for new slide
+
+            updateControls();
+            updateSlideIndicator();
+        }
+
+        function updateControls() {
+            document.getElementById('prevSlideBtn').disabled = currentSlideIndex === 0;
+            document.getElementById('nextSlideBtn').disabled = currentSlideIndex === slides.length - 1;
+        }
+
+        function updateSlideIndicator() {
+            document.getElementById('currentSlide').textContent = currentSlideIndex + 1;
+            document.getElementById('totalSlides').textContent = slides.length;
+        }
+
+        function playVoiceover() {
+            if (speechSynth.speaking) {
+                speechSynth.cancel(); // Stop current speech if any
+            }
+
+            const voiceoverTextElement = slides[currentSlideIndex].querySelector('.voiceover-text');
+            if (voiceoverTextElement) {
+                utterance.text = voiceoverTextElement.textContent;
+                utterance.lang = 'en-US';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                speechSynth.speak(utterance);
+            }
+        }
+
+        document.getElementById('nextSlideBtn').addEventListener('click', () => {
+            showSlide(currentSlideIndex + 1);
+        });
+
+        document.getElementById('prevSlideBtn').addEventListener('click', () => {
+            showSlide(currentSlideIndex - 1);
+        });
+
+        document.getElementById('playVoiceoverBtn').addEventListener('click', playVoiceover);
+
+        // Touch/Swipe navigation for mobile devices
+        const presentationContainer = document.querySelector('.presentation-container');
+        let startX = 0;
+        let startY = 0;
+        const swipeThreshold = 50; // Minimum pixel distance for a swipe to register
+
+        presentationContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        presentationContainer.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const deltaX = startX - endX;
+            const deltaY = startY - endY;
+
+            // Only consider horizontal swipes if they are significantly larger than vertical movement
+            if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+                if (deltaX > 0) { // Swiped left
+                    showSlide(currentSlideIndex + 1);
+                } else { // Swiped right
+                    showSlide(currentSlideIndex - 1);
+                }
+            }
+        }, { passive: true });
+
+
+        // Initialize presentation
+        showSlide(0);
+
+        // Optional: Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                showSlide(currentSlideIndex + 1);
+            } else if (e.key === 'ArrowLeft') {
+                showSlide(currentSlideIndex - 1);
+            } else if (e.key === ' ') { // Spacebar for voiceover
+                e.preventDefault(); // Prevent page scroll
+                playVoiceover();
+            }
+        });
+    </script>
+</body>
+</html>

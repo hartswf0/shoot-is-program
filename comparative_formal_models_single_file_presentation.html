@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Comparative Formal Models — Jurgenson • Flusser • Spatiotemporal Presentation</title>
+<meta name="description" content="Single‑file, mobile‑friendly presentation comparing Jurgenson, Flusser, and a spatiotemporal presentation model. Offline, no libraries.">
+<style>
+  :root{
+    --bg:#0b0b0c; --fg:#f6f3ee; --muted:#b9b3a9; --accent:#e24c3b; --accent2:#ffd166; --ok:#2dd4bf; --warn:#f59e0b;
+    --card:rgba(255,255,255,.06); --glass:rgba(255,255,255,.08); --border:rgba(255,255,255,.14);
+    --radius:18px; --pad:18px; --shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;}
+  a{color:var(--accent2)}
+  .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100dvh}
+  header{position:sticky;top:0;background:linear-gradient(180deg, rgba(11,11,12,.9), rgba(11,11,12,.6));backdrop-filter:saturate(1.1) blur(10px);border-bottom:1px solid var(--border);z-index:10}
+  header .bar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px var(--pad)}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:34px;height:34px;border-radius:12px;background:conic-gradient(from 30deg, var(--accent), var(--accent2), #6ee7b7, var(--accent));box-shadow:0 0 0 2px var(--border) inset}
+  .title{font-weight:700;letter-spacing:.3px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  button, .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--fg);padding:10px 12px;border-radius:12px;cursor:pointer;font-weight:600}
+  button:hover{border-color:var(--accent2)}
+  .pill{padding:6px 10px;border-radius:999px;font-size:.85rem;border:1px solid var(--border);background:var(--glass)}
+  .view{display:grid;grid-template-columns:1fr;gap:12px;padding:12px}
+
+  /* Slide stage */
+  .stage{position:relative;display:grid;place-items:center;padding:10px}
+  .frame{position:relative;width:100%;max-width:1200px;aspect-ratio:16/9;background:linear-gradient(180deg,#121214, #0b0b0c);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .slide{position:absolute;inset:0;padding:clamp(16px,3vw,38px);display:grid;grid-template-rows:auto 1fr auto;gap:10px;opacity:0;transform:translateY(10px) scale(.99);transition:opacity .35s ease, transform .35s ease}
+  .slide.active{opacity:1;transform:translateY(0) scale(1)}
+  .slide h1{margin:0;font-size:clamp(22px,3.4vw,38px);line-height:1.15}
+  .slide h2{margin:.2em 0 .4em;font-size:clamp(18px,2.2vw,26px);color:var(--accent2)}
+  .slide .content{align-self:start;overflow:auto}
+  .slide .content p{margin:.5em 0;color:#efece6}
+  .slide .content ul{margin:.3em 0 .8em 1.1em}
+  .slide .content li{margin:.25em 0}
+  .slide footer{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:.9rem}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tag{border:1px solid var(--border);border-radius:999px;padding:4px 8px;color:var(--muted)}
+
+  /* Presenter HUD */
+  .hud{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:10px;padding:10px;background:linear-gradient(180deg, transparent, rgba(0,0,0,.37));}
+  .prog{height:6px;background:var(--glass);border-radius:999px;overflow:hidden;flex:1;border:1px solid var(--border)}
+  .prog span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent), var(--accent2));}
+  .nav{display:flex;gap:8px}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--border);border-radius:8px;padding:2px 6px;background:var(--glass);color:var(--muted)}
+
+  /* Deck navigation */
+  .deckbar{display:flex;gap:8px;overflow:auto;padding:8px var(--pad);border-top:1px solid var(--border);background:linear-gradient(0deg, rgba(11,11,12,.9), rgba(11,11,12,.6));backdrop-filter:saturate(1.1) blur(10px)}
+  .thumb{min-width:220px;display:grid;grid-template-rows:auto 1fr auto;gap:6px;padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--card);cursor:pointer}
+  .thumb .t{font-weight:700;font-size:.95rem}
+  .thumb .s{font-size:.85rem;color:var(--muted)}
+  .thumb.active{outline:2px solid var(--accent2)}
+
+  /* Grid view (4-up) */
+  .grid{display:none;gap:14px;padding:12px}
+  .grid.on{display:grid}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  @media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
+  .cell{border:1px solid var(--border);border-radius:14px;background:var(--card);padding:10px;cursor:pointer;display:grid;grid-template-rows:auto 1fr;gap:8px}
+  .cell h3{margin:0;font-size:1rem}
+  .cell p{margin:0;color:var(--muted);font-size:.9rem}
+
+  /* Outline / caption panel */
+  .drawer{position:fixed;inset:auto 0 0 0;max-height:55dvh;transform:translateY(100%);transition:transform .35s ease;background:linear-gradient(180deg, #0b0b0c, #09090a);border-top:1px solid var(--border);box-shadow:0 -12px 40px rgba(0,0,0,.5);z-index:20}
+  .drawer.on{transform:translateY(0)}
+  .drawer .head{display:flex;align-items:center;justify-content:space-between;padding:10px var(--pad)}
+  .drawer .body{padding:0 var(--pad) var(--pad);overflow:auto;max-height:50dvh}
+  details{border:1px solid var(--border);border-radius:12px;padding:10px;margin:10px 0;background:var(--card)}
+  summary{cursor:pointer;font-weight:700}
+  .caption{color:#efece6}
+
+  /* High-contrast mode */
+  .hc :root{}
+  .hc body{background:#000;color:#fff}
+  .hc .frame{background:#000}
+  .hc .slide .content p{color:#fff}
+
+  /* Print-friendly */
+  @media print{
+    header, .deckbar, .drawer, .hud{display:none !important}
+    .frame{border:none;box-shadow:none}
+    .slide{position:relative;opacity:1;transform:none;page-break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app" aria-live="polite">
+  <header>
+    <div class="bar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="title">Comparative Formal Models — <span class="pill">Jurgenson</span> <span class="pill">Flusser</span> <span class="pill">Spatiotemporal</span></div>
+      </div>
+      <div class="controls">
+        <button id="prevBtn" title="Previous (←)">◀ Prev</button>
+        <button id="nextBtn" title="Next (→)">Next ▶</button>
+        <button id="gridBtn" title="Toggle 4‑up grid (G)">Grid 4‑up</button>
+        <button id="outlineBtn" title="Toggle outline/captions (O)">Outline</button>
+        <button id="hcBtn" title="High contrast (H)">High Contrast</button>
+        <button id="dlBtn" title="Download this HTML">Download</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="view">
+    <section class="stage" aria-label="Slide Stage">
+      <div class="frame" id="frame" role="group" aria-roledescription="carousel" aria-label="Slides">
+        <!-- Slides injected by JS -->
+        <div class="hud" aria-hidden="true">
+          <div class="prog" aria-label="Progress"><span id="prog"></span></div>
+          <div class="nav">
+            <div class="kbd">←</div>
+            <div class="kbd">→</div>
+            <div class="kbd">G</div>
+            <div class="kbd">O</div>
+            <div class="kbd">H</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" id="grid" aria-label="4‑up Grid">
+      <!-- Grid cells injected by JS -->
+    </section>
+  </main>
+
+  <nav class="deckbar" id="deckbar" aria-label="Deck Thumbnails">
+    <!-- Thumbs injected by JS -->
+  </nav>
+
+  <aside class="drawer" id="drawer" aria-label="Outline and Captions" aria-expanded="false">
+    <div class="head">
+      <div style="font-weight:700">Outline & Captions</div>
+      <button id="closeDrawer">Close</button>
+    </div>
+    <div class="body" id="outline">
+      <!-- Outline injected by JS -->
+    </div>
+  </aside>
+</div>
+
+<script>
+// --- DATA: Slides content (derived from your brief) ---
+const DECK = [
+  {
+    id:"cover",
+    title:"Comparative Formal Models",
+    subtitle:"Jurgenson • Flusser • Spatiotemporal Presentation",
+    tags:["overview","single‑file","mobile"],
+    caption:"Three complementary lenses on human–technology mediation: cultural (Jurgenson), practical (Flusser), and pedagogical (presentation).",
+    html:`<p>This deck contrasts <strong>temporal orientation</strong>, <strong>agency</strong>, <strong>system scale</strong>, and <strong>forms of programming</strong>, then synthesizes them into a layered literacy.</p>`
+  },
+  {
+    id:"temporal",
+    title:"Key Difference 1: Temporal Orientation",
+    subtitle:"Present • Transition • Pedagogical Sequence",
+    tags:["time","orientation"],
+    caption:"Each model lives on a different temporal axis: present therapy, epochal transition, sequenced pedagogy.",
+    html:`<ul>
+      <li><strong>Jurgenson:</strong> <em>Therapeutic present</em> — dissolves online/offline anxiety through anti‑dualism.</li>
+      <li><strong>Flusser:</strong> <em>Historical transition</em> — writing → technical images; post‑historical consciousness.</li>
+      <li><strong>Presentation model:</strong> <em>Pedagogical sequence</em> — motion graphics as embodied learning over time.</li>
+    </ul>`
+  },
+  {
+    id:"agency",
+    title:"Key Difference 2: Agency & Resistance",
+    subtitle:"Forms of agency within constraints",
+    tags:["agency","resistance"],
+    caption:"Different roles cultivate different tactics of freedom inside systems.",
+    html:`<ul>
+      <li><strong>Jurgenson:</strong> <em>Therapeutic agency</em> — cultural therapist refutes harmful binaries.</li>
+      <li><strong>Flusser:</strong> <em>Creative agency</em> — operator outwits apparatus via skilled gesture.</li>
+      <li><strong>Presentation:</strong> <em>Interactive agency</em> — user controls temporal progression within a sequence.</li>
+    </ul>`
+  },
+  {
+    id:"scale",
+    title:"Key Difference 3: System Boundaries & Scale",
+    subtitle:"Discursive • Technical‑practical • Pedagogical‑aesthetic",
+    tags:["systems","scale"],
+    caption:"Each defines the boundaries of analysis in a different domain.",
+    html:`<ul>
+      <li><strong>Jurgenson:</strong> <em>Cultural‑discursive systems</em> — stories about tech and their effects.</li>
+      <li><strong>Flusser:</strong> <em>Technical‑practical systems</em> — apparatus ↔ operator complexes.</li>
+      <li><strong>Presentation:</strong> <em>Pedagogical‑aesthetic systems</em> — transmitting abstractions via visuals/audio.</li>
+    </ul>`
+  },
+  {
+    id:"programming",
+    title:"Key Difference 4: Forms of Programming",
+    subtitle:"Cultural • Technical • Pedagogical",
+    tags:["programming","behavior"],
+    caption:"All three accept that systems program behavior — but name different programs.",
+    html:`<ul>
+      <li><strong>Jurgenson:</strong> <em>Cultural programming</em> — false binaries induce anxiety about connection.</li>
+      <li><strong>Flusser:</strong> <em>Technical programming</em> — apparatus constraints delimit possibilities.</li>
+      <li><strong>Presentation:</strong> <em>Pedagogical programming</em> — structured sequences guide learning.</li>
+    </ul>`
+  },
+  {
+    id:"synthesis",
+    title:"Synthesis: Complementary Layers",
+    subtitle:"Cultural • Practical • Pedagogical",
+    tags:["synthesis","layers"],
+    caption:"Complete analysis requires discourse, practice, and pedagogy.",
+    html:`<ul>
+      <li><strong>Cultural Layer (Jurgenson):</strong> How we <em>narratively construct</em> our relation to tech.</li>
+      <li><strong>Practical Layer (Flusser):</strong> How we <em>operate</em> within systems, and resist creatively.</li>
+      <li><strong>Pedagogical Layer (Presentation):</strong> How we <em>transmit</em> complex relations to learners.</li>
+    </ul>`
+  },
+  {
+    id:"implications",
+    title:"Implications: Toward Technological Literacy",
+    subtitle:"Beyond binaries toward hybrid formations",
+    tags:["literacy","implications"],
+    caption:"Dialectical thinking over simple oppositions; literacies that navigate complexity.",
+    html:`<ul>
+      <li>Refuse <em>online vs. offline</em>, <em>human vs. technology</em>, <em>resistance vs. compliance</em> binaries.</li>
+      <li>Adopt <em>hybrid</em> and <em>ecological</em> frames as default explanations.</li>
+      <li>Design pedagogy that reveals <em>constraints</em> while cultivating <em>agency</em>.</li>
+    </ul>`
+  },
+  {
+    id:"call",
+    title:"Call to Action",
+    subtitle:"Design for agency within constraints",
+    tags:["action","design"],
+    caption:"Build experiences that surface programs, expand gestures, and repair narratives.",
+    html:`<ul>
+      <li><strong>Surface programs:</strong> Make cultural/technical/pedagogical constraints legible.</li>
+      <li><strong>Expand gestures:</strong> Increase the repertoire of meaningful user actions.</li>
+      <li><strong>Repair narratives:</strong> Replace panic/naivety with nuanced stories and tools.</li>
+    </ul>`
+  },
+  {
+    id:"ref",
+    title:"Reference",
+    subtitle:"Source pointer",
+    tags:["reference"],
+    caption:"See the attached note for provenance.",
+    html:`<p>Based on the comparative write‑up you provided. See <em>paste.txt</em> reference in your materials.</p>`
+  }
+];
+
+// --- STATE ---
+let idx = 0; // current slide index
+const qs = s => document.querySelector(s);
+const qsa = s => Array.from(document.querySelectorAll(s));
+
+// --- RENDER: slides, thumbs, grid, outline ---
+function render(){
+  const frame = qs('#frame');
+  // clear slides
+  qsa('.slide').forEach(n=>n.remove());
+  // build slides
+  DECK.forEach((s,i)=>{
+    const el = document.createElement('article');
+    el.className = 'slide' + (i===idx? ' active':'');
+    el.setAttribute('role','group');
+    el.setAttribute('aria-roledescription','slide');
+    el.setAttribute('aria-label', `${i+1} of ${DECK.length}: ${s.title}`);
+    el.innerHTML = `
+      <header>
+        <h1>${s.title}</h1>
+        ${s.subtitle?`<h2>${s.subtitle}</h2>`:''}
+      </header>
+      <div class="content">${s.html}</div>
+      <footer>
+        <div class="tags">${(s.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div>${i+1}/${DECK.length}</div>
+      </footer>`;
+    frame.appendChild(el);
+  });
+
+  // progress
+  const pct = ((idx+1)/DECK.length)*100; qs('#prog').style.width = pct+'%';
+
+  // deckbar
+  const bar = qs('#deckbar'); bar.innerHTML = '';
+  DECK.forEach((s,i)=>{
+    const t = document.createElement('button');
+    t.className = 'thumb'+(i===idx?' active':'');
+    t.innerHTML = `<div class="t">${s.title}</div><div class="s">${s.subtitle||''}</div>`;
+    t.addEventListener('click',()=>go(i));
+    bar.appendChild(t);
+  });
+
+  // grid
+  const grid = qs('#grid'); grid.innerHTML = '';
+  DECK.forEach((s,i)=>{
+    const c = document.createElement('div');
+    c.className = 'cell';
+    c.innerHTML = `<h3>${i+1}. ${s.title}</h3><p>${s.subtitle||''}</p>`;
+    c.addEventListener('click',()=>{toggleGrid(false); go(i)});
+    grid.appendChild(c);
+  });
+
+  // outline/captions
+  const outline = qs('#outline'); outline.innerHTML='';
+  DECK.forEach((s,i)=>{
+    const det = document.createElement('details');
+    if(i===idx) det.setAttribute('open','');
+    det.innerHTML = `<summary>${i+1}. ${s.title} <span style="color:var(--muted)">— ${s.subtitle||''}</span></summary>
+    <div class="caption">${s.caption||''}</div>`;
+    det.addEventListener('toggle',()=>{ if(det.open) go(i); });
+    outline.appendChild(det);
+  });
+
+  // update hash
+  location.hash = '#'+DECK[idx].id;
+  // focus for a11y
+  qsa('.slide')[idx].focus?.();
+}
+
+function go(i){
+  idx = Math.max(0, Math.min(DECK.length-1, i));
+  qsa('.slide').forEach((el,j)=>{
+    el.classList.toggle('active', j===idx);
+  });
+  qsa('.thumb').forEach((el,j)=>{
+    el.classList.toggle('active', j===idx);
+  });
+  // progress
+  const pct = ((idx+1)/DECK.length)*100; qs('#prog').style.width = pct+'%';
+  // hash
+  location.hash = '#'+DECK[idx].id;
+}
+
+function next(){ go(idx+1); }
+function prev(){ go(idx-1); }
+
+function toggleGrid(force){
+  const g = qs('#grid');
+  const on = typeof force === 'boolean' ? force : !g.classList.contains('on');
+  g.classList.toggle('on', on);
+}
+function toggleDrawer(force){
+  const d = qs('#drawer');
+  const on = typeof force === 'boolean' ? force : !d.classList.contains('on');
+  d.classList.toggle('on', on); d.setAttribute('aria-expanded', on?'true':'false');
+}
+function toggleHC(){ document.documentElement.classList.toggle('hc'); }
+
+// Keyboard & touch
+addEventListener('keydown', e=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key)){ e.preventDefault(); next(); }
+  if(['ArrowLeft','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+  if(e.key==='g' || e.key==='G'){ toggleGrid(); }
+  if(e.key==='o' || e.key==='O'){ toggleDrawer(); }
+  if(e.key==='h' || e.key==='H'){ toggleHC(); }
+});
+
+// Basic swipe for mobile
+let touchX=null; let touchY=null;
+addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; touchX=t.clientX; touchY=t.clientY; }, {passive:true});
+addEventListener('touchend', e=>{
+  const t=e.changedTouches[0]; if(touchX==null) return; const dx=t.clientX-touchX; const dy=t.clientY-touchY;
+  if(Math.abs(dx)>60 && Math.abs(dy)<50){ dx<0? next(): prev(); }
+  touchX=touchY=null;
+});
+
+// Buttons
+qs('#nextBtn').addEventListener('click', next);
+qs('#prevBtn').addEventListener('click', prev);
+qs('#gridBtn').addEventListener('click', ()=>toggleGrid());
+qs('#outlineBtn').addEventListener('click', ()=>toggleDrawer());
+qs('#closeDrawer').addEventListener('click', ()=>toggleDrawer(false));
+qs('#hcBtn').addEventListener('click', toggleHC);
+
+// Download self as HTML
+qs('#dlBtn').addEventListener('click', ()=>{
+  const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), {href:url, download:'comparative-formal-models.html'});
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 1000);
+});
+
+// Init from hash if present
+function initFromHash(){
+  const h = location.hash.replace('#',''); if(!h) return;
+  const i = DECK.findIndex(s=>s.id===h); if(i>=0) idx=i;
+}
+
+initFromHash();
+render();
+
+</script>
+</body>
+</html>

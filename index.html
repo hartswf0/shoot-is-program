@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f0f10" />
+  <title>Film Roll Index</title>
+  <style>
+    :root {
+      --bg: #0f0f10;
+      --card: #17181a;
+      --text: #e8e8ea;
+      --muted: #a8a8ad;
+      --accent: #7aa2ff;
+      --accent-2: #74d4c6;
+      --ring: #2a2b31;
+      --shadow: rgba(0,0,0,0.5);
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      background: radial-gradient(1200px 800px at 20% -10%, #15161a 0%, #0f0f10 50%, #0b0b0c 100%);
+      color: var(--text);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: saturate(140%) blur(8px);
+      background: linear-gradient(180deg, rgba(15,15,16,0.85), rgba(15,15,16,0.6));
+      border-bottom: 1px solid var(--ring);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: max(env(safe-area-inset-top), 12px) 16px 12px 16px;
+    }
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      font-size: 18px;
+    }
+    .meta { color: var(--muted); font-size: 13px; }
+
+    .controls {
+      display: flex; gap: 8px; margin-left: auto; align-items: center;
+    }
+    .btn {
+      appearance: none; border: 1px solid var(--ring); background: var(--card); color: var(--text);
+      border-radius: 999px; padding: 8px 12px; font-size: 13px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 20px var(--shadow);
+    }
+    .btn:hover { border-color: #2f6feb; color: #cfe0ff; }
+
+    main { padding: 18px 0 36px; }
+
+    .filmroll {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 82vw;
+      gap: 14px;
+      padding: 10px 16px 18px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    @media (min-width: 720px) {
+      .filmroll { grid-auto-columns: min(480px, 42vw); }
+    }
+
+    .shot {
+      scroll-snap-align: start;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0));
+      border: 1px solid var(--ring);
+      border-radius: var(--radius);
+      overflow: clip;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      min-height: 260px;
+      position: relative;
+    }
+
+    .frame {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      background:
+        radial-gradient(120% 60% at 0% 0%, rgba(122,162,255,0.12), transparent 60%),
+        radial-gradient(120% 60% at 100% 0%, rgba(116,212,198,0.12), transparent 60%),
+        #0b0c0f;
+      border-bottom: 1px solid var(--ring);
+      position: relative;
+    }
+    .frame iframe {
+      width: 100%; height: 100%; border: 0; display: block; border-bottom: 1px solid var(--ring);
+    }
+    .frame .overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, rgba(11,12,15,0.0), rgba(11,12,15,0.45));
+      opacity: 0; transition: opacity 200ms ease;
+    }
+    .frame:hover .overlay { opacity: 1; }
+    .overlay .play {
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
+      border: 1px solid var(--ring); background: rgba(23,24,26,0.85); color: var(--text);
+    }
+
+    .info { padding: 10px 12px 12px; display: grid; gap: 8px; }
+    .title { font-weight: 600; font-size: 14px; line-height: 1.35; }
+    .title small { color: var(--muted); font-weight: 400; }
+    .actions { display: flex; gap: 8px; }
+    .pill {
+      border: 1px solid var(--ring); background: #111214; color: var(--text); border-radius: 10px;
+      padding: 8px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    }
+    .pill:hover { border-color: #2f6feb; color: #cfe0ff; }
+
+    .film-edge {
+      position: absolute; top: 0; bottom: 0; width: 10px; left: -6px; right: auto;
+      background: repeating-linear-gradient(180deg, #26272b, #26272b 10px, #1a1b1f 10px, #1a1b1f 20px);
+      filter: drop-shadow(2px 0 0 rgba(0,0,0,0.25)); border-radius: 8px;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed; inset: 0; display: none; place-items: center; background: rgba(0,0,0,0.6);
+      z-index: 50; padding: 24px;
+    }
+    .modal.open { display: grid; }
+    .modal-card {
+      width: min(100%, 1200px); height: min(88vh, 720px); border-radius: 16px; overflow: hidden;
+      background: #0b0c0f; border: 1px solid var(--ring); box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+      display: grid; grid-template-rows: auto 1fr;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--ring); }
+    .modal-title { font-weight: 600; font-size: 14px; }
+    .close-btn { border: 1px solid var(--ring); background: var(--card); color: var(--text); border-radius: 999px; padding: 6px 10px; cursor: pointer; }
+    .modal-body { position: relative; }
+    .modal-body iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    /* Helpers */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; white-space: nowrap; }
+
+    /* Pull-to-edges padding on notched devices */
+    .p-safe { padding-left: max(env(safe-area-inset-left), 16px); padding-right: max(env(safe-area-inset-right), 16px); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar p-safe">
+      <div class="brand">Film Roll Index</div>
+      <div class="meta" id="countMeta">0 shots</div>
+      <div class="controls">
+        <button class="btn" id="toggleDensity">Compact</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="filmroll" id="filmroll" aria-live="polite"></section>
+  </main>
+
+  <!-- Modal for enlarged presentation -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Preview</div>
+        <button class="close-btn" id="closeModal" aria-label="Close">Close</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="modalFrame" referrerpolicy="no-referrer"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // List of HTML documents to index (auto-generated)
+    const documents = [
+      { path: 'ai_studio_code - 2025-09-18T125634.521.html' },
+      { path: 'ai_studio_code - 2025-09-18T130206.784.html' },
+      { path: 'ai_studio_code - 2025-09-18T130707.466.html' },
+      { path: 'ai_studio_code - 2025-09-18T130833.175.html' },
+      { path: 'ai_studio_code - 2025-09-18T131149.302.html' },
+      { path: 'ai_studio_code - 2025-09-18T131427.306.html' },
+      { path: 'ai_studio_code - 2025-09-18T131542.231.html' },
+      { path: 'ai_studio_code - 2025-09-18T131555.655.html' },
+      { path: 'ai_studio_code - 2025-09-18T131603.159.html' },
+      { path: 'comparative_formal_models_single_file_presentation.html' },
+      { path: 'flusser_4_platforms_clean_deck.html' },
+      { path: 'flusser_episodes_mobile_presentation_player (1).html' },
+      { path: 'flusser_episodes_mobile_presentation_player.html' },
+      { path: 'post_binary_media_theory_single_file_presentation.html' }
+    ].map((d) => ({
+      ...d,
+      title: beautifyTitle(d.path)
+    }));
+
+    function beautifyTitle(filename) {
+      const name = filename.replace(/\.html$/i, '')
+        .replace(/[_-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    }
+
+    const filmroll = document.getElementById('filmroll');
+    const countMeta = document.getElementById('countMeta');
+    countMeta.textContent = `${documents.length} shots`;
+
+    function shotTemplate(doc, index) {
+      const id = `shot-${index}`;
+      return `
+        <article class="shot" data-path="${doc.path}" data-title="${doc.title}">
+          <div class="film-edge" aria-hidden="true"></div>
+          <div class="frame" data-iframe-container>
+            <iframe title="${doc.title}" data-src="${doc.path}" loading="lazy" referrerpolicy="no-referrer"></iframe>
+            <div class="overlay">
+              <button class="play pill" data-open>Present ▶</button>
+            </div>
+          </div>
+          <div class="info">
+            <div class="title">${doc.title} <small>(${doc.path})</small></div>
+            <div class="actions">
+              <button class="pill" data-open>Open Modal</button>
+              <a class="pill" href="${doc.path}" target="_blank" rel="noopener">Open in New Tab ↗</a>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    filmroll.innerHTML = documents.map(shotTemplate).join('');
+
+    // Lazy-load iframes when visible using IntersectionObserver
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const iframe = entry.target.querySelector('iframe');
+          if (iframe && !iframe.src) {
+            iframe.src = iframe.dataset.src;
+          }
+          io.unobserve(entry.target);
+        }
+      }
+    }, { root: filmroll, rootMargin: '200px', threshold: 0.01 });
+
+    document.querySelectorAll('[data-iframe-container]').forEach(el => io.observe(el));
+
+    // Modal logic
+    const modal = document.getElementById('modal');
+    const modalFrame = document.getElementById('modalFrame');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    function openModal(path, title) {
+      modal.classList.add('open');
+      modalFrame.src = path;
+      document.getElementById('modalTitle').textContent = title || 'Preview';
+      history.replaceState(null, '', updateQueryString('open', encodeURIComponent(path)));
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      modalFrame.src = '';
+      history.replaceState(null, '', updateQueryString('open', null));
+    }
+
+    document.addEventListener('click', (e) => {
+      const openBtn = e.target.closest('[data-open]');
+      if (openBtn) {
+        const shot = openBtn.closest('.shot');
+        if (shot) openModal(shot.dataset.path, shot.dataset.title);
+      }
+    });
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+
+    // Allow tapping the frame to open
+    document.querySelectorAll('.frame').forEach(frame => {
+      frame.addEventListener('click', () => {
+        const shot = frame.closest('.shot');
+        if (shot) openModal(shot.dataset.path, shot.dataset.title);
+      });
+    });
+
+    // Density toggle
+    const toggleDensity = document.getElementById('toggleDensity');
+    let compact = false;
+    toggleDensity.addEventListener('click', () => {
+      compact = !compact;
+      document.documentElement.style.setProperty('--radius', compact ? '10px' : '14px');
+      document.querySelectorAll('.shot .frame').forEach(el => el.style.aspectRatio = compact ? '4 / 3' : '16 / 9');
+      toggleDensity.textContent = compact ? 'Comfort' : 'Compact';
+    });
+
+    // Query param open=path to auto-open
+    const params = new URLSearchParams(location.search);
+    const toOpen = params.get('open');
+    if (toOpen) {
+      try {
+        const decoded = decodeURIComponent(toOpen);
+        const doc = documents.find(d => d.path === decoded);
+        if (doc) openModal(doc.path, doc.title);
+      } catch (e) { /* ignore */ }
+    }
+
+    function updateQueryString(key, value) {
+      const url = new URL(location.href);
+      if (value === null) url.searchParams.delete(key); else url.searchParams.set(key, value);
+      return url.toString();
+    }
+  </script>
+</body>
+</html>
