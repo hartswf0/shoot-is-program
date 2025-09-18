@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Towards a Philosophy of Photography: A Flusserian Model of Post-Industrial Existence</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            display: none; /* Hidden by default */
+            box-sizing: border-box;
+        }
+        .container.active {
+            display: block;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+            color: #222;
+            margin-top: 2em;
+            margin-bottom: 0.8em;
+            line-height: 1.2;
+        }
+        h1 { font-size: 2.8em; text-align: center; color: #1a1a1a; margin-top: 1.5em; }
+        h2 { font-size: 2em; border-bottom: 2px solid #eee; padding-bottom: 0.3em; }
+        h3 { font-size: 1.6em; color: #444; }
+        h4 { font-size: 1.3em; color: #555; }
+
+        p { margin-bottom: 1em; }
+        strong { color: #000; }
+        em { font-style: italic; color: #666; }
+
+        .quote {
+            font-style: italic;
+            margin: 1.5em 2em;
+            padding: 0.5em 1em;
+            border-left: 4px solid #ccc;
+            background-color: #f5f5f5;
+            color: #555;
+        }
+        .citation {
+            font-size: 0.8em;
+            text-align: right;
+            display: block;
+            margin-top: 0.5em;
+            color: #777;
+        }
+
+        .entity, .morphism {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #eef;
+            padding: 0.1em 0.4em;
+            border-radius: 3px;
+            color: #005;
+        }
+        .morphism {
+            background-color: #fee;
+            color: #500;
+        }
+        .sitemap ul {
+            list-style-type: none;
+            padding-left: 1.5em;
+            border-left: 2px dashed #ddd;
+            margin-left: 1em;
+        }
+        .sitemap ul ul {
+            border-left: none;
+            margin-left: 0;
+            padding-left: 1em;
+        }
+        .sitemap li {
+            margin-bottom: 0.5em;
+        }
+        .sitemap li::before {
+            content: '• ';
+            color: #aaa;
+            margin-right: 0.5em;
+        }
+        .sitemap ul li::before {
+            content: '— ';
+            color: #aaa;
+            margin-right: 0.5em;
+        }
+
+        .code-block {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            padding: 1em;
+            margin: 1.5em 0;
+            overflow-x: auto;
+        }
+        .code-block code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .navigation {
+            text-align: center;
+            padding: 20px;
+            background-color: #eee;
+            border-top: 1px solid #ddd;
+        }
+        .navigation button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .navigation button:hover {
+            background-color: #777;
+        }
+        .navigation button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        .page-indicator {
+            margin: 0 15px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container active" id="slide-0">
+        <h1>Towards a Philosophy of Photography:</h1>
+        <h2>A Flusserian Model of Post-Industrial Existence</h2>
+        <p>This presentation unpacks Vilém Flusser's foundational critique of photography, proposing it as a lens through which to understand the fundamental transformations of human culture in the post-industrial age. We will explore four interconnected platforms that constitute his philosophical model, delving into the nature of apparatuses, technical images, the possibility of freedom, and the mechanisms of information distribution.</p>
+        <p class="quote">"A philosophy of photography is necessary because it is the only form of revolution left open to us."</p>
+        <p>Flusser's work challenges us to critically engage with the ubiquitous "photographic universe" that surrounds and programs us, urging a deeper interrogation of our robotized existence and the potential for genuine human intention amidst automated systems.</p>
+    </div>
+
+    <div class="container" id="slide-1">
+        <h2>1) <span class="entity">The Apparatus</span> as <span class="entity">Super-Black-Box</span></h2>
+        <h3>One-line: Reality is produced by nested programs; humans operate as functionaries at the edges.</h3>
+        <p>Flusser posits that <span class="entity">apparatuses</span> are not mere tools but complex <span class="morphism">playthings that simulate thought</span>, operating as impenetrable <span class="entity">black boxes</span>. They are systems <span class="morphism">programmed</span> by higher-order <span class="entity">metaprograms</span>, dictating a vast yet finite set of possibilities. In this landscape, humans are reduced to <span class="entity">functionaries</span>, controlling only the input and output, while the inner workings remain opaque. Power, therefore, <span class="morphism">shifts from the ownership of physical objects to the control of software</span> and the programming of existence.</p>
+
+        <h4>Entities & Morphisms</h4>
+        <ul>
+            <li><span class="entity">Apparatus</span>: A complex plaything or game that simulates thought.</li>
+            <li><span class="entity">Program</span>: A combination game with clear and distinct elements, dictating possibilities.</li>
+            <li><span class="entity">Metaprogram</span>: A higher-order program that programs another program.</li>
+            <li><span class="entity">Black-Box</span>: The impenetrable interior of an apparatus, concealing its encoding processes.</li>
+            <li><span class="entity">Functionary</span>: A person who plays with an apparatus and acts as a function of it.</li>
+            <li><span class="morphism">[is-programmed-by]</span>: How a <span class="entity">Program</span> is set by a <span class="entity">Metaprogram</span>.</li>
+            <li><span class="morphism">[simulates-thought]</span>: The core action of an <span class="entity">Apparatus</span> (computational thinking).</li>
+            <li><span class="morphism">[hides-internal-workings]</span>: Characteristic of a <span class="entity">Black-Box</span>.</li>
+            <li><span class="morphism">[operates-as-a-function-of]</span>: The <span class="entity">Functionary</span>'s relationship to the <span class="entity">Apparatus</span>.</li>
+            <li><span class="morphism">[shifts-power-to]</span>: The transfer of control from hardware owners to software programmers.</li>
+        </ul>
+
+        <h4>Sitemap</h4>
+        <div class="sitemap code-block">
+            <code>
+                &lt;Super-Black-Box&gt; (representing the entire system of apparatuses)<br>
+                ├── &lt;Metaprogram&gt; [is-programmed-by] &lt;Program&gt;<br>
+                │   └── (of the Photographic Industry, Industrial Complex, Socio-economic System)<br>
+                ├── &lt;Apparatus&gt; (e.g., camera)<br>
+                │   ├── [simulates-thought] (computational thinking)<br>
+                │   └── &lt;Black-Box&gt; [hides-internal-workings]<br>
+                └── &lt;Functionary&gt; (e.g., photographer)<br>
+                    └── [operates-as-a-function-of] &lt;Apparatus&gt;<br>
+            </code>
+        </div>
+
+        <h4>Supporting Quotes</h4>
+        <div class="quote">
+            "The camera, as a prototype of the apparatuses that have become so decisive for the present and the immediate future, provides an appropriate starting point for a general analysis of apparatus..."<br>
+            "The encoding of technical images, however, is what is going on in the interior of this black box and consequently any criticism of technical images must be aimed at an elucidation of its inner workings."<br>
+            "Power has moved from the owner of objects to the programmer and the operator."<br>
+            "The camera (like all apparatuses that followed it) is computational thinking flowing into hardware."
+        </div>
+    </div>
+
+    <div class="container" id="slide-2">
+        <h2>2) <span class="entity">The Technical Image</span> and the "Magic of Objectivity"</h2>
+        <h3>One-line: Photos look objective but actually encode theories and programs.</h3>
+        <p>The <span class="entity">technical image</span>, particularly the photograph, presents itself with an <span class="morphism">illusion of objectivity</span>, appearing as a transparent window onto the world. However, Flusser reveals it as a <span class="morphism">third-order abstraction</span>: it abstracts from texts, which abstract from traditional images, which in turn abstract from the concrete world. These images <span class="morphism">encode concepts</span> and programs, <span class="morphism">putting texts under a magic spell</span> and re-enchanting a theoretical discourse into seemingly self-evident "states of things." This deceptive character necessitates a critical act of <span class="morphism">decoding</span> to uncover its programmed significance.</p>
+
+        <h4>Entities & Morphisms</h4>
+        <ul>
+            <li><span class="entity">Technical-Image</span>: A technological or mechanical image created by apparatus.</li>
+            <li><span class="entity">Concepts</span>: Constitutive elements of a text, signified by technical images.</li>
+            <li><span class="entity">Text</span>: Series of written signs, from which technical images are ultimately derived.</li>
+            <li><span class="entity">Surface</span>: The two-dimensional medium of an image.</li>
+            <li><span class="entity">Viewer</span>: The recipient of the technical image.</li>
+            <li><span class="morphism">[abstracts-from]</span>: The hierarchical derivation of images from texts and reality.</li>
+            <li><span class="morphism">[encodes]</span>: Translating <span class="entity">Concepts</span> into symbolic "states of things."</li>
+            <li><span class="morphism">[appears-as-objective]</span>: The deceptive quality of technical images.</li>
+            <li><span class="morphism">[must-be-decoded]</span>: The necessary critical act to understand true significance.</li>
+            <li><span class="morphism">[puts-under-a-magic-spell]</span>: How technical images re-enchant theoretical texts.</li>
+        </ul>
+
+        <h4>Sitemap</h4>
+        <div class="sitemap code-block">
+            <code>
+                &lt;Technical-Image&gt;<br>
+                ├── &lt;Concepts&gt; (from scientific theories) [encodes] → &lt;Program&gt; (within apparatus)<br>
+                │   └── [renders-as-states-of-things] → &lt;Surface&gt; (the photograph)<br>
+                │       └── [appears-as-objective] → &lt;Viewer&gt;<br>
+                └── &lt;Viewer&gt;<br>
+                    ├── (naïve) [is-programmed-by] &lt;Magic-Spell&gt;<br>
+                    └── (critical) [must-be-decoded] → &lt;Concepts&gt;<br>
+            </code>
+        </div>
+
+        <h4>Supporting Quotes</h4>
+        <div class="quote">
+            "Ontologically, traditional images signify phenomena whereas technical images signify concepts."<br>
+            "This apparently non-symbolic, objective character of technical images leads whoever looks at them to see them not as images but as windows."<br>
+            "The 'objectivity' of technical images is an illusion."<br>
+            "It is precisely this deception that has to be decoded so as to identify the true significance of the photograph, i.e. programmed concepts..."<br>
+            "Black-and-white photographs embody the magic of theoretical thought since they transform the linear discourse of theory into surfaces."
+        </div>
+    </div>
+
+    <div class="container" id="slide-3">
+        <h2>3) <span class="entity">Freedom</span> as <span class="morphism">[Playing-Against-The-Program]</span></h2>
+        <h3>One-line: Human freedom = creating improbable, informative moves inside (and against) the program.</h3>
+        <p>In a world dominated by apparatuses, freedom is not found in escape, but in strategic engagement. The <span class="entity">photographer</span>, as <span class="entity">Homo ludens</span> (player) rather than <span class="entity">Homo faber</span> (worker), <span class="morphism">plays against the camera's program</span>. This involves navigating <span class="entity">quantum doubt</span>—discrete moments of hesitation and decision—to create <span class="entity">informative images</span>: unpredictable, improbable outputs that break free from the program's redundant possibilities. This act of <span class="morphism">smuggling human intention into the program</span> is the essence of challenging automation and asserting a new form of freedom.</p>
+
+        <h4>Entities & Morphisms</h4>
+        <ul>
+            <li><span class="entity">Photographer</span>: A person who attempts to place unpredictable information within an image.</li>
+            <li><span class="entity">Camera-Program</span>: The finite, yet vast, set of possibilities within the camera.</li>
+            <li><span class="entity">Informative-Image</span>: An improbable output, signifying a "breakthrough" against redundancy.</li>
+            <li><span class="entity">Quantum-Doubt</span>: Atomized hesitations and decisions in the act of photography.</li>
+            <li><span class="entity">Human-Intention</span>: The photographer's conscious aim to encode concepts and create models.</li>
+            <li><span class="morphism">[plays-against]</span>: The central act of the <span class="entity">Photographer</span> challenging the <span class="entity">Camera-Program</span>.</li>
+            <li><span class="morphism">[produces]</span>: The outcome of play, resulting in <span class="entity">Informative-Images</span>.</li>
+            <li><span class="morphism">[navigates-via]</span>: How photographers make choices through <span class="entity">Quantum-Doubt</span>.</li>
+            <li><span class="morphism">[smuggles-into-program]</span>: Introducing unpredictable elements of <span class="entity">Human-Intention</span>.</li>
+            <li><span class="morphism">[subordinates-to]</span>: The goal of making the camera serve <span class="entity">Human-Intention</span>.</li>
+        </ul>
+
+        <h4>Sitemap</h4>
+        <div class="sitemap code-block">
+            <code>
+                &lt;Freedom&gt;<br>
+                ├── &lt;Photographer&gt; [plays-against] &lt;Camera-Program&gt;<br>
+                │   ├── [navigates-via] &lt;Quantum-Doubt&gt; (atomized decisions)<br>
+                │   └── [smuggles-into-program] &lt;Human-Intention&gt;<br>
+                ├── [produces] &lt;Informative-Image&gt; (new, improbable information)<br>
+                └── (Goal: &lt;Photographer&gt; [subordinates-to] &lt;Human-Intention&gt;)<br>
+            </code>
+        </div>
+
+        <h4>Supporting Quotes</h4>
+        <div class="quote">
+            "Photographers endeavour to exhaust the photographic program by realizing all their possibilities."<br>
+            "The camera is not a tool but a plaything, and a photographer is not a worker but a player: not Homo faber but Homo ludens."<br>
+            "Freedom is playing against the camera."<br>
+            "First, one can outwit the camera's rigidity. Second, one can smuggle human intentions into its program that are not predicted by it. Third, one can force the camera to create the unpredictable, the improbable, the informative."
+        </div>
+    </div>
+
+    <div class="container" id="slide-4">
+        <h2>4) <span class="entity">The Distribution-Channel</span> as Encoder of Significance</h2>
+        <h3>One-line: Meaning is assigned downstream; channels program reception.</h3>
+        <p>Photographs are not neutral objects; their meaning is profoundly shaped by the <span class="entity">distribution channels</span> through which they circulate. These vast, programmed <span class="entity">apparatuses</span> (media like newspapers, galleries) <span class="morphism">impregnate the photograph with decisive significance</span>, transforming it from a mere flyer into an <span class="entity">encoded significance</span>. This process <span class="morphism">programs the audience's behavior</span>, often leading to uncritical, ritualistic responses. A constant <span class="morphism">struggle exists between the photographer's intention and the channel's program</span>, a drama frequently <span class="morphism">obscured by standard photography criticism</span>, thereby reinforcing the apparatus's power.</p>
+
+        <h4>Entities & Morphisms</h4>
+        <ul>
+            <li><span class="entity">Distribution-Channel</span>: Programmed apparatuses that reproduce and circulate photographs (e.g., scientific, political, artistic media).</li>
+            <li><span class="entity">Photograph</span>: A portable image whose value lies in its surface information and reproducibility.</li>
+            <li><span class="entity">Encoded-Significance</span>: The meaning a photograph acquires within a specific <span class="entity">Channel</span>.</li>
+            <li><span class="entity">Audience</span>: The receivers whose behavior is programmed by the <span class="entity">Channels</span>.</li>
+            <li><span class="entity">Photographer-Intention</span>: The original aim of the photographer.</li>
+            <li><span class="morphism">[reproduces-and-channels]</span>: How <span class="entity">Channels</span> circulate <span class="entity">Photographs</span> into categories.</li>
+            <li><span class="morphism">[impregnates-with]</span>: How <span class="entity">Channels</span> instill <span class="entity">Encoded-Significance</span>.</li>
+            <li><span class="morphism">[programs-behavior]</span>: The effect of <span class="entity">Encoded-Significance</span> on the <span class="entity">Audience</span>.</li>
+            <li><span class="morphism">[struggles-with]</span>: The conflict between <span class="entity">Photographer-Intention</span> and <span class="entity">Channel-Program</span>.</li>
+            <li><span class="morphism">[obscures-this-struggle]</span>: The role of uncritical photography criticism.</li>
+        </ul>
+
+        <h4>Sitemap</h4>
+        <div class="sitemap code-block">
+            <code>
+                &lt;Distribution-Field&gt;<br>
+                ├── &lt;Photographer&gt; with &lt;Photographer-Intention&gt;<br>
+                │   └── [struggles-with] &lt;Distribution-Channel&gt; [reproduces-and-channels] → &lt;Photograph&gt;<br>
+                │       └── [impregnates-with] &lt;Encoded-Significance&gt; (scientific, political, commercial, artistic)<br>
+                └── &lt;Audience&gt; &lt;= [programs-behavior] &lt;Encoded-Significance&gt;<br>
+                    └── (Photography-Criticism [obscures-this-struggle])<br>
+            </code>
+        </div>
+
+        <h4>Supporting Quotes</h4>
+        <div class="quote">
+            "The distribution apparatuses impregnate the photograph with the decisive significance for its reception."<br>
+            "Every distributed photograph allows photography criticism to reconstruct the struggle between photographer and channel."<br>
+            "By concealing this struggle, photographic criticism makes the 'media' totally invisible for the receiver of the photograph."<br>
+            "photographs get an uncritical reception and are therefore able to program the receiver to act as if they are under a magic spell; this action flows back in the form of feedback into the programs of the apparatus."
+        </div>
+    </div>
+
+    <div class="container" id="slide-5">
+        <h2>Crosswalk: Generalizing the Flusserian Model</h2>
+        <h3>Applying the Critique to Broader Post-Industrial Systems</h3>
+        <p>Flusser's philosophy of photography is not confined to the darkroom or the gallery; it serves as a powerful model for understanding the fundamental transformations in all apparatus-based universes. The photographic universe is a prototype for post-industrial society itself, where human experience, knowledge, and action are increasingly "robotized" into a staccato mosaic of programmed combinations.</p>
+        <p>This critical framework can be extended to analyze phenomena far beyond traditional photography, encompassing digital media, artificial intelligence, and complex socio-economic systems. The core primitives — <span class="entity">Image</span>, <span class="entity">Apparatus</span>, <span class="entity">Program</span>, and <span class="entity">Information</span> — remain central to dissecting how automated systems exert control and how human agency might still find a space for freedom.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Flusserian Concept</th>
+                    <th>Generalized System Primitive</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="entity">Photographic Universe</span></td>
+                    <td>&lt;System&gt; / &lt;Universe&gt;</td>
+                    <td>The complex, self-regulating totality of apparatuses, programs, and their outputs.</td>
+                </tr>
+                <tr>
+                    <td><span class="entity">Apparatus</span> (Camera, Computer)</td>
+                    <td>&lt;Engine&gt; / &lt;Mechanism&gt;</td>
+                    <td>The core computational or operational unit that produces results based on rules.</td>
+                </tr>
+                <tr>
+                    <td><span class="entity">Program</span> / <span class="entity">Metaprogram</span></td>
+                    <td>&lt;Constraint&gt; / &lt;Rule-Set&gt;</td>
+                    <td>The defining algorithms, protocols, or instructions that dictate system behavior.</td>
+                </tr>
+                <tr>
+                    <td><span class="entity">Technical Image</span></td>
+                    <td>&lt;Window&gt; / &lt;Interface&gt;</td>
+                    <td>The output that appears to reflect reality but is actually a programmed construct.</td>
+                </tr>
+                <tr>
+                    <td><span class="entity">Informative Image</span></td>
+                    <td>&lt;Novelty&gt; / &lt;Breakthrough&gt;</td>
+                    <td>An unexpected, non-redundant output that challenges the system's predictability.</td>
+                </tr>
+                <tr>
+                    <td><span class="entity">Functionary</span> / <span class="entity">Photographer</span></td>
+                    <td>&lt;Actor&gt; / &lt;Agent&gt;</td>
+                    <td>The human operator whose actions are influenced and often programmed by the system.</td>
+                </tr>
+                <tr>
+                    <td><span class="entity">Distribution-Channel</span></td>
+                    <td>&lt;Network&gt; / &lt;Media&gt;</td>
+                    <td>The infrastructure that circulates information and shapes its interpretation.</td>
+                </tr>
+                <tr>
+                    <td><span class="morphism">[Playing-Against-The-Program]</span></td>
+                    <td>&lt;Strategic-Intervention&gt;</td>
+                    <td>The act of subverting programmed expectations to introduce human intention.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Supporting Quotes</h4>
+        <div class="quote">
+            "The photographic universe can serve as a model for post-industrial society as a whole and that a philosophy of photography can be the starting point for any philosophy engaging with the current and future existence of human beings."<br>
+            "Within such cultural criticism, the camera will prove to be the ancestor of all those apparatuses that are in the process of robotizing all aspects of our lives, from one's most public acts to one's innermost thoughts, feelings and desires."
+        </div>
+    </div>
+
+    <div class="container" id="slide-6">
+        <h2>Conclusion: The Revolution of Photography</h2>
+        <h3>Towards a Future of Conscious Creation</h3>
+        <p>Flusser's "Towards a Philosophy of Photography" is a profound call to consciousness in an age increasingly dominated by automated, programmed <span class="entity">apparatuses</span>. By meticulously dissecting the seemingly innocent act of photography, he reveals a universe where <span class="entity">images</span>, far from being neutral reflections, <span class="morphism">program our perception</span> and <span class="morphism">robotize our actions</span>.</p>
+        <p>The philosophical task, therefore, is urgent: to <span class="morphism">[uncover the terrible fact of this unintentional, rigid and uncontrollable functionality]</span> of apparatuses. This is not a luddite rejection but an invitation to understand and leverage the very mechanisms that seek to constrain us. True <span class="entity">freedom</span> emerges not from escaping the apparatus, but from <span class="morphism">[playing against its program]</span>, from intentionally seeking the <span class="entity">improbable</span> and the <span class="entity">informative</span>, thereby <span class="morphism">[smuggling human intention]</span> into the heart of the machine's logic.</p>
+        <p>In this post-historical landscape, where the material yields to the symbolic, the struggle for freedom becomes an intellectual battle—a continuous act of <span class="morphism">[decoding]</span>, of making transparent the hidden <span class="entity">programs</span> that shape our reality. This philosophy is not merely about photography; it is about reclaiming agency in a world that seeks to turn us into mere <span class="entity">functionaries</span> of its own programmed existence. This, Flusser argues, is the only form of revolution left open to us.</p>
+        <p class="quote">"Such a philosophy is necessary because it is the only form of revolution left open to us."</p>
+    </div>
+
+    <div class="navigation">
+        <button id="prevBtn" disabled>Previous</button>
+        <span class="page-indicator">Page <span id="currentPage">1</span> of <span id="totalPages"></span></span>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.container');
+        let currentSlideIndex = 0;
+        const totalSlides = slides.length;
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentPageSpan = document.getElementById('currentPage');
+        const totalPagesSpan = document.getElementById('totalPages');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+            currentPageSpan.textContent = index + 1;
+            prevBtn.disabled = (index === 0);
+            nextBtn.disabled = (index === totalSlides - 1);
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') {
+                nextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initialize presentation
+        totalPagesSpan.textContent = totalSlides;
+        showSlide(currentSlideIndex);
+    </script>
+</body>
+</html>```

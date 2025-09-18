@@ -16,13 +16,39 @@
       --ring: #2a2b31;
       --shadow: rgba(0,0,0,0.5);
       --radius: 14px;
+      --bg-grad: radial-gradient(1200px 800px at 20% -10%, #15161a 0%, #0f0f10 50%, #0b0b0c 100%);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+    }
+    :root[data-theme="light"] {
+      --bg: #ffffff;
+      --card: #f7f7f8;
+      --text: #0f0f10;
+      --muted: #5f6067;
+      --accent: #2554ff;
+      --accent-2: #0ba895;
+      --ring: #e5e7eb;
+      --shadow: rgba(0,0,0,0.12);
+      --bg-grad: radial-gradient(1400px 900px at 20% -10%, #f4f6fb 0%, #ffffff 60%, #fbfbfd 100%);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+    }
+    :root[data-theme="news"] {
+      --bg: #faf3e0;
+      --card: #fffdf7;
+      --text: #1e1b16;
+      --muted: #6a6257;
+      --accent: #8b5e34;
+      --accent-2: #3f6b59;
+      --ring: #e9ddc9;
+      --shadow: rgba(30,27,22,0.1);
+      --bg-grad: radial-gradient(1200px 800px at 20% -10%, #fff7e6 0%, #faf3e0 60%, #f6edd9 100%);
+      --font: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
-      background: radial-gradient(1200px 800px at 20% -10%, #15161a 0%, #0f0f10 50%, #0b0b0c 100%);
+      font-family: var(--font);
+      background: var(--bg-grad);
       color: var(--text);
     }
 
@@ -56,6 +82,7 @@
       display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 20px var(--shadow);
     }
     .btn:hover { border-color: #2f6feb; color: #cfe0ff; }
+    .select { appearance: none; border: 1px solid var(--ring); background: var(--card); color: var(--text); border-radius: 999px; padding: 8px 12px; font-size: 13px; box-shadow: 0 6px 20px var(--shadow); }
 
     main { padding: 18px 0 36px; }
 
@@ -72,6 +99,9 @@
     @media (min-width: 720px) {
       .filmroll { grid-auto-columns: min(480px, 42vw); }
     }
+    /* Grid mode */
+    .filmroll.grid { grid-auto-flow: row; grid-auto-columns: unset; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); overflow-x: visible; scroll-snap-type: none; }
+    @media (min-width: 720px) { .filmroll.grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); } }
 
     .shot {
       scroll-snap-align: start;
@@ -89,10 +119,8 @@
     .frame {
       aspect-ratio: 16 / 9;
       width: 100%;
-      background:
-        radial-gradient(120% 60% at 0% 0%, rgba(122,162,255,0.12), transparent 60%),
-        radial-gradient(120% 60% at 100% 0%, rgba(116,212,198,0.12), transparent 60%),
-        #0b0c0f;
+      /* Black background to ensure consistent preview backing */
+      background: #000;
       border-bottom: 1px solid var(--ring);
       position: relative;
     }
@@ -114,9 +142,11 @@
     .title { font-weight: 600; font-size: 14px; line-height: 1.35; }
     .title small { color: var(--muted); font-weight: 400; }
     .actions { display: flex; gap: 8px; }
+    .badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 4px 8px; border-radius: 999px; border: 1px dashed var(--ring); color: var(--muted); background: transparent; }
     .pill {
-      border: 1px solid var(--ring); background: #111214; color: var(--text); border-radius: 10px;
-      padding: 8px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+      border: 1px solid var(--ring); background: var(--card); color: var(--text); border-radius: 10px;
+      padding: 8px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; text-decoration: none;
     }
     .pill:hover { border-color: #2f6feb; color: #cfe0ff; }
 
@@ -124,6 +154,15 @@
       position: absolute; top: 0; bottom: 0; width: 10px; left: -6px; right: auto;
       background: repeating-linear-gradient(180deg, #26272b, #26272b 10px, #1a1b1f 10px, #1a1b1f 20px);
       filter: drop-shadow(2px 0 0 rgba(0,0,0,0.25)); border-radius: 8px;
+    }
+
+    /* States */
+    .shot.selected { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .shot.is-fixed { border-color: var(--accent-2); box-shadow: 0 12px 36px rgba(0,0,0,0.45); }
+    .shot.is-fixed::after {
+      content: 'Fixed'; position: absolute; top: 8px; right: -28px; transform: rotate(35deg);
+      background: var(--accent-2); color: #0b0c0f; font-weight: 700; font-size: 10px;
+      padding: 4px 28px; border-radius: 2px; letter-spacing: .5px;
     }
 
     /* Modal */
@@ -156,6 +195,15 @@
       <div class="brand">Film Roll Index</div>
       <div class="meta" id="countMeta">0 shots</div>
       <div class="controls">
+        <select class="select" id="viewMode" aria-label="View Mode">
+          <option value="film">Film Roll</option>
+          <option value="grid">Grid</option>
+        </select>
+        <select class="select" id="themeMode" aria-label="Theme">
+          <option value="dark">Black</option>
+          <option value="light">White</option>
+          <option value="news">Newspaper</option>
+        </select>
         <button class="btn" id="toggleDensity">Compact</button>
       </div>
     </div>
@@ -164,6 +212,19 @@
   <main>
     <section class="filmroll" id="filmroll" aria-live="polite"></section>
   </main>
+
+  <!-- Playlist toolbar -->
+  <div class="playlist-bar p-safe" id="playlistBar" style="position: sticky; bottom: 0; inset-inline: 0; display: none; padding: 10px 16px; background: color-mix(in oklab, var(--bg) 88%, transparent); border-top: 1px solid var(--ring); gap: 8px; align-items: center; z-index: 20;">
+    <span id="selectionCount" class="meta">0 selected</span>
+    <input id="playlistName" class="select" style="border-radius: 10px; min-width: 160px;" placeholder="Playlist name" />
+    <button class="btn" id="savePlaylist">Save</button>
+    <select class="select" id="loadPlaylist" style="min-width: 160px;">
+      <option value="">Load playlist…</option>
+    </select>
+    <button class="btn" id="playPlaylist">Play ▶</button>
+    <button class="btn" id="clearSelection">Clear</button>
+    <button class="btn" id="deletePlaylist" title="Delete loaded playlist">Delete</button>
+  </div>
 
   <!-- Modal for enlarged presentation -->
   <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -190,15 +251,17 @@
       { path: 'ai_studio_code - 2025-09-18T131542.231.html' },
       { path: 'ai_studio_code - 2025-09-18T131555.655.html' },
       { path: 'ai_studio_code - 2025-09-18T131603.159.html' },
+      { path: 'ai_studio_code - 2025-09-18T132452.819.html' },
+      { path: 'ai_studio_code - 2025-09-18T132737.678.html' },
       { path: 'comparative_formal_models_single_file_presentation.html' },
       { path: 'flusser_4_platforms_clean_deck.html' },
       { path: 'flusser_episodes_mobile_presentation_player (1).html' },
       { path: 'flusser_episodes_mobile_presentation_player.html' },
       { path: 'post_binary_media_theory_single_file_presentation.html' }
-    ].map((d) => ({
-      ...d,
-      title: beautifyTitle(d.path)
-    }));
+    ].map((d) => {
+      const meta = parseVersionFromFilename(d.path);
+      return { ...d, title: beautifyTitle(d.path), versionLabel: meta.label, sortKey: meta.sortKey };
+    }).sort((a,b) => b.sortKey - a.sortKey);
 
     function beautifyTitle(filename) {
       const name = filename.replace(/\.html$/i, '')
@@ -206,6 +269,15 @@
         .replace(/\s+/g, ' ')
         .trim();
       return name.charAt(0).toUpperCase() + name.slice(1);
+    }
+    function parseVersionFromFilename(filename) {
+      const m = filename.match(/(\d{4}-\d{2}-\d{2})T(\d{6})(?:\.(\d{3}))?/);
+      if (!m) return { label: 'v—', sortKey: 0 };
+      const [_, ymd, hms, ms = '000'] = m;
+      const hh = hms.slice(0,2), mm = hms.slice(2,4), ss = hms.slice(4,6);
+      const sortKey = Number(`${ymd.replace(/-/g,'')}${hh}${mm}${ss}${ms}`);
+      const label = `v${ymd} ${hh}:${mm}:${ss}.${ms}`;
+      return { label, sortKey };
     }
 
     const filmroll = document.getElementById('filmroll');
@@ -225,7 +297,12 @@
           </div>
           <div class="info">
             <div class="title">${doc.title} <small>(${doc.path})</small></div>
+            <div class="badges"><span class="badge">${doc.versionLabel}</span></div>
             <div class="actions">
+              <label class="pill" style="gap:10px; user-select: none;">
+                <input type="checkbox" data-select style="accent-color: var(--accent); width: 16px; height: 16px;" /> Select
+              </label>
+              <button class="pill" data-fixed>Fixed ✓</button>
               <button class="pill" data-open>Open Modal</button>
               <a class="pill" href="${doc.path}" target="_blank" rel="noopener">Open in New Tab ↗</a>
             </div>
@@ -255,6 +332,13 @@
     const modal = document.getElementById('modal');
     const modalFrame = document.getElementById('modalFrame');
     const closeModalBtn = document.getElementById('closeModal');
+    // next/prev controls for playlist
+    const modalHeader = document.querySelector('.modal-header');
+    const nextBtn = document.createElement('button'); nextBtn.className = 'btn'; nextBtn.textContent = 'Next ▶';
+    const prevBtn = document.createElement('button'); prevBtn.className = 'btn'; prevBtn.textContent = '◀ Prev';
+    const headerRight = document.createElement('div'); headerRight.style.display = 'flex'; headerRight.style.gap = '8px';
+    headerRight.appendChild(prevBtn); headerRight.appendChild(nextBtn);
+    modalHeader.appendChild(headerRight);
 
     function openModal(path, title) {
       modal.classList.add('open');
@@ -274,6 +358,11 @@
         const shot = openBtn.closest('.shot');
         if (shot) openModal(shot.dataset.path, shot.dataset.title);
       }
+      const fixedBtn = e.target.closest('[data-fixed]');
+      if (fixedBtn) {
+        const shot = fixedBtn.closest('.shot');
+        if (shot) toggleFixed(shot.dataset.path, shot);
+      }
     });
     document.getElementById('closeModal').addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
@@ -287,15 +376,149 @@
       });
     });
 
+    // View & Theme controls
+    const filmrollEl = document.getElementById('filmroll');
+    const viewMode = document.getElementById('viewMode');
+    const themeMode = document.getElementById('themeMode');
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+    function applyView(mode) {
+      filmrollEl.classList.toggle('grid', mode === 'grid');
+    }
+    function applyTheme(theme) {
+      const map = { dark: '#0f0f10', light: '#ffffff', news: '#faf3e0' };
+      document.documentElement.setAttribute('data-theme', theme === 'dark' ? '' : theme);
+      if (theme === 'dark') document.documentElement.removeAttribute('data-theme');
+      if (metaTheme) metaTheme.setAttribute('content', map[theme] || '#0f0f10');
+    }
+    function persist(key, val) { try { localStorage.setItem(key, val); } catch(e){} }
+    function retrieve(key, fallback) { try { return localStorage.getItem(key) || fallback; } catch(e){ return fallback; } }
+    function getParam(name) { const p = new URLSearchParams(location.search); return p.get(name); }
+    function setParam(name, value) { const url = new URL(location.href); if (value==null) url.searchParams.delete(name); else url.searchParams.set(name, value); history.replaceState(null, '', url.toString()); }
+
+    // Initialize controls from URL or localStorage
+    const initView = getParam('view') || retrieve('view', 'film');
+    const initTheme = getParam('theme') || retrieve('theme', 'dark');
+    viewMode.value = initView;
+    themeMode.value = initTheme;
+    applyView(initView);
+    applyTheme(initTheme);
+    persist('view', initView);
+    persist('theme', initTheme);
+
+    viewMode.addEventListener('change', () => { applyView(viewMode.value); persist('view', viewMode.value); setParam('view', viewMode.value); });
+    themeMode.addEventListener('change', () => { applyTheme(themeMode.value); persist('theme', themeMode.value); setParam('theme', themeMode.value); });
+
     // Density toggle
     const toggleDensity = document.getElementById('toggleDensity');
-    let compact = false;
-    toggleDensity.addEventListener('click', () => {
-      compact = !compact;
+    let compact = retrieve('density', 'comfort') === 'compact';
+    function applyDensity() {
       document.documentElement.style.setProperty('--radius', compact ? '10px' : '14px');
       document.querySelectorAll('.shot .frame').forEach(el => el.style.aspectRatio = compact ? '4 / 3' : '16 / 9');
       toggleDensity.textContent = compact ? 'Comfort' : 'Compact';
+    }
+    applyDensity();
+    toggleDensity.addEventListener('click', () => {
+      compact = !compact; persist('density', compact ? 'compact' : 'comfort'); applyDensity();
     });
+
+    // Fixed markers persistence
+    function isFixed(path) { try { return localStorage.getItem('fixed:'+path) === '1'; } catch(e){ return false; } }
+    function setFixed(path, val) { try { localStorage.setItem('fixed:'+path, val ? '1' : '0'); } catch(e){} }
+    function applyFixedUI(shotEl, fixed) {
+      shotEl.classList.toggle('is-fixed', fixed);
+      const btn = shotEl.querySelector('[data-fixed]');
+      if (btn) btn.textContent = fixed ? 'Fixed ✓' : 'Mark Fixed';
+    }
+    function toggleFixed(path, shotEl) { const v = !isFixed(path); setFixed(path, v); applyFixedUI(shotEl, v); }
+
+    // Selection & playlist
+    const playlistBar = document.getElementById('playlistBar');
+    const selectionCount = document.getElementById('selectionCount');
+    const playlistName = document.getElementById('playlistName');
+    const savePlaylistBtn = document.getElementById('savePlaylist');
+    const loadPlaylistSel = document.getElementById('loadPlaylist');
+    const playPlaylistBtn = document.getElementById('playPlaylist');
+    const clearSelectionBtn = document.getElementById('clearSelection');
+    const deletePlaylistBtn = document.getElementById('deletePlaylist');
+
+    let selectedOrder = [];
+    const selectedSet = new Set();
+
+    function updateBar() {
+      selectionCount.textContent = `${selectedOrder.length} selected`;
+      playlistBar.style.display = selectedOrder.length > 0 ? 'flex' : 'none';
+    }
+    function attachSelectionHandlers() {
+      document.querySelectorAll('[data-select]').forEach(cb => {
+        const shot = cb.closest('.shot');
+        const path = shot.dataset.path;
+        cb.checked = selectedSet.has(path);
+        shot.classList.toggle('selected', cb.checked);
+        cb.addEventListener('change', () => {
+          if (cb.checked) { if (!selectedSet.has(path)) { selectedSet.add(path); selectedOrder.push(path); } }
+          else { selectedSet.delete(path); selectedOrder = selectedOrder.filter(p => p !== path); }
+          shot.classList.toggle('selected', cb.checked);
+          updateBar();
+        });
+      });
+    }
+    function loadPlaylists() {
+      const list = JSON.parse(localStorage.getItem('playlists')||'[]');
+      loadPlaylistSel.innerHTML = '<option value="">Load playlist…</option>' + list.map((pl, i) => `<option value="${pl.name}">${pl.name} (${pl.items.length})</option>`).join('');
+      return list;
+    }
+    function savePlaylists(list) { localStorage.setItem('playlists', JSON.stringify(list)); }
+    function getPlaylistByName(name) { return loadPlaylists().find(p => p.name === name); }
+
+    savePlaylistBtn.addEventListener('click', () => {
+      const name = (playlistName.value || '').trim();
+      if (!name || selectedOrder.length === 0) return;
+      const list = loadPlaylists();
+      const idx = list.findIndex(p => p.name === name);
+      const payload = { name, items: [...selectedOrder] };
+      if (idx >= 0) list[idx] = payload; else list.push(payload);
+      savePlaylists(list); loadPlaylists();
+    });
+    loadPlaylistSel.addEventListener('change', () => {
+      const name = loadPlaylistSel.value; if (!name) return;
+      const pl = getPlaylistByName(name); if (!pl) return;
+      selectedOrder = [...pl.items]; selectedSet.clear(); pl.items.forEach(p => selectedSet.add(p));
+      document.querySelectorAll('[data-select]').forEach(el => { const shot = el.closest('.shot'); const path = shot.dataset.path; const on = selectedSet.has(path); el.checked = on; shot.classList.toggle('selected', on); });
+      playlistName.value = name; updateBar();
+    });
+    deletePlaylistBtn.addEventListener('click', () => {
+      const name = loadPlaylistSel.value; if (!name) return;
+      const list = loadPlaylists().filter(p => p.name !== name); savePlaylists(list); loadPlaylists();
+      if (playlistName.value === name) playlistName.value = '';
+    });
+    clearSelectionBtn.addEventListener('click', () => {
+      selectedOrder = []; selectedSet.clear(); document.querySelectorAll('[data-select]').forEach(el => { el.checked = false; el.closest('.shot').classList.remove('selected'); }); updateBar();
+    });
+
+    // Playlist play logic
+    let playingList = null; let playIndex = 0;
+    function playList(items, start = 0) {
+      if (!items || items.length === 0) return;
+      playingList = items; playIndex = Math.max(0, Math.min(start, items.length - 1));
+      openModal(playingList[playIndex], beautifyTitle(playingList[playIndex]));
+      updatePrevNext();
+    }
+    function updatePrevNext() {
+      prevBtn.disabled = !playingList || playIndex <= 0;
+      nextBtn.disabled = !playingList || playIndex >= (playingList?.length - 1);
+    }
+    function nextItem() { if (!playingList) return; if (playIndex < playingList.length - 1) { playIndex++; openModal(playingList[playIndex], beautifyTitle(playingList[playIndex])); updatePrevNext(); } }
+    function prevItem() { if (!playingList) return; if (playIndex > 0) { playIndex--; openModal(playingList[playIndex], beautifyTitle(playingList[playIndex])); updatePrevNext(); } }
+    nextBtn.addEventListener('click', nextItem);
+    prevBtn.addEventListener('click', prevItem);
+    playPlaylistBtn.addEventListener('click', () => { playList([...selectedOrder], 0); });
+
+    // Initialize selections, fixed state, and playlists
+    attachSelectionHandlers();
+    document.querySelectorAll('.shot').forEach(shot => applyFixedUI(shot, isFixed(shot.dataset.path)));
+    loadPlaylists();
+    updateBar();
 
     // Query param open=path to auto-open
     const params = new URLSearchParams(location.search);
